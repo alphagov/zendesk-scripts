@@ -1,5 +1,14 @@
 require 'zendesk_api'
 
+if ARGV[0].nil? || ARGV[1].nil?
+  puts "Specify a year to delete as an argument (eg 2012)"
+  puts "Specify a queue (aka group) as an argument after the year to delete"
+  exit(1)
+else
+  @year_to_delete = ARGV[0].to_i
+  @queue = ARGV[1].to_i
+end
+
 @client = ZendeskAPI::Client.new do |config|
   config.url = ENV['ZENDESK_URL']
   config.username = ENV['ZENDESK_USER_EMAIL']
@@ -8,132 +17,20 @@ require 'zendesk_api'
   config.retry = true
 end
 
+puts "Total tickets overall: #{@client.tickets.count}"
 
+ticket_count_for_year = @client.search(:query => "type:ticket group_id:#{@queue} status:closed updated_at>#{@year_to_delete}-01-01 updated_at<#{@year_to_delete + 1}-01-01").count
 
-# count how many ticket IDs
+# The Zendesk API has 100 tickets per page, so programatically
+# determine how many pages we have by rounding to the nearest 100.
+number_of_pages = (ticket_count_for_year.ceil / 100).to_i
 
-puts "Total Tickets: #{@client.tickets.count}"
+@tickets = []
 
-
-#
-# 2012
-#
-
-@y2012_tickets = []
-
-
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2012-01-01 updated_at<2013-01-01").count
-
-(1..1000).each do |i|
-  @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2012-01-01 updated_at<2013-01-01").page(i).each do |ticket|
-    @y2012_tickets << ticket['id']
+(1..number_of_pages).each do |i|
+  @client.search(:query => "type:ticket group_id:#{@queue} status:closed updated_at>#{@year_to_delete}-01-01 updated_at<#{@year_to_delete + 1}-01-01").page(i).each do |ticket|
+    @tickets << ticket['id']
   end
 end
 
-File.open("data/y2012_tickets", "w") { |file| file.write(@y2012_tickets) }
-
-
-#
-# 2013
-#
-
-@y2013_tickets = []
-
-#
-puts "Total Tickets 2013"
-#
-
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2013-01-01 updated_at<2014-01-01").count
-
-(1..1000).each do |i|
-  @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2013-01-01 updated_at<2014-01-01").page(i).each do |ticket|
-    @y2013_tickets << ticket['id']
-  end
-end
-
-File.open("data/y2013_tickets", "w") { |file| file.write(@y2013_tickets) }
-
-
-#
-# 2014
-#
-
-@y2014_tickets = []
-
-#
-puts "Total Tickets 2014"
-#
-
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2014-01-01 updated_at<2015-01-01").count
-
-(1..1000).each do |i|
-  @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2014-01-01 updated_at<2015-01-01").page(i).each do |ticket|
-    @y2014_tickets << ticket['id']
-  end
-end
-
-File.open("data/y2014_tickets", "w") { |file| file.write(@y2014_tickets) }
-
-
-#
-# 2015
-#
-
-@y2015_tickets = []
-
-#
-puts "Total Tickets 2015"
-#
-
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2015-01-01 updated_at<2016-01-01").count
-
-(1..100).each do |i|
-  @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2015-01-01 updated_at<2016-01-01").page(i).each do |ticket|
-    @y2015_tickets << ticket['id']
-  end
-end
-
-File.open("data/y2015_tickets", "w") { |file| file.write(@y2015_tickets) }
-
-
-
-#
-# 2016
-#
-
-@y2016 = []
-
-#
-puts "Total Tickets 2016"
-#
-
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2016-01-01 updated_at<2017-01-01").count
-
-(1..100).each do |i|
-  @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2016-01-01 updated_at<2017-01-01").page(i).each do |ticket|
-    @y2016_tickets << ticket['id']
-  end
-end
-
-File.open("data/y2016_tickets", "w") { |file| file.write(@y2016_tickets) }
-
-
-#
-# 2017
-#
-
-@y2017 = []
-
-#
-puts "Total Tickets 2017"
-#
-
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2017-01-01 updated_at<2018-01-01").count
-
-(1..100).each do |i|
-  @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2017-01-01 updated_at<2018-01-01").page(i).each do |ticket|
-    @y2017_tickets << ticket['id']
-  end
-end
-
-File.open("data/y2017_tickets", "w") { |file| file.write(@y2017_tickets) }
+File.open("data/y#{@year_to_delete}_tickets", "w") { |file| file.write(@tickets) }
