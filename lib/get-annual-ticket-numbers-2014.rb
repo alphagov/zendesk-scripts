@@ -27,6 +27,6 @@ puts @client.search(:query => "type:ticket group_id:20188163 status:closed updat
   end
 end
 
-File.open("y2014_tickets", "w") { |file| file.write(@y2014_tickets) }
+File.open("data/y2014_tickets", "w") { |file| file.write(@y2014_tickets) }
 
 exit
