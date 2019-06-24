@@ -1,0 +1,30 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    faraday (0.15.4)
+      multipart-post (>= 1.2, < 3)
+    gds_zendesk (3.0.0)
+      null_logger (= 0.0.1)
+      zendesk_api (= 1.14.4)
+    hashie (3.6.0)
+    inflection (1.0.0)
+    mime-types (3.2.2)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2019.0331)
+    multipart-post (2.1.1)
+    null_logger (0.0.1)
+    zendesk_api (1.14.4)
+      faraday (~> 0.9)
+      hashie (>= 3.5.2, < 4.0.0)
+      inflection
+      mime-types
+      multipart-post (~> 2.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  gds_zendesk (= 3.0.0)
+
+BUNDLED WITH
+   1.17.1
