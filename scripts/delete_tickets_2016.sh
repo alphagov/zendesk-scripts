@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if ! [ "${DRY_RUN+1}" ] ; then
+if [ "${DRY_RUN+1}" ] ; then
   for raw_id in `cat data/y2016_tickets`
 		do
 			clean_id=`echo $raw_id | sed -e 's/\,//g' | sed -e 's/\]//g' | sed -e 's/\[//g'`
