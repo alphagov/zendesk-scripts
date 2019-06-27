@@ -23,7 +23,7 @@ ticket_count_for_year = @client.search(:query => "type:ticket group_id:#{@queue}
 
 # The Zendesk API has 100 tickets per page, so programatically
 # determine how many pages we have by rounding to the nearest 100.
-number_of_pages = (ticket_count_for_year.ceil / 100).to_i
+number_of_pages = (ticket_count_for_year.to_f / 100).ceil
 
 @tickets = []
 
