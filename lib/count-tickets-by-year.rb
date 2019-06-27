@@ -27,6 +27,3 @@ puts "Total Tickets 2017"
 puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2017-01-01 updated_at<2018-01-01").count
 puts "Total Tickets 2018"
 puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2018-01-01 updated_at<#{lastyear}").count
-
-exit
- 
