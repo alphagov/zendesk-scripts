@@ -6,7 +6,6 @@ if [ $# -ne 1 ]; then
 fi
 
 year=$1
-echo "data/remote/users_not_deleted_${year}"
 last_login=2018
 last_login1=$((last_login+1))
 
@@ -19,14 +18,14 @@ do
   if [ $login_year != $last_login ]; then #not 2018
 
     if [ $login_year != $last_login1 ]; then #not 2018 or 2019
-      echo "curl $ZENDESK_URL/users/$clean_id -u $ZENDESK_USER_EMAIL:$ZENDESK_USER_PASSWORD -X DELETE"
-      # echo $clean_id >> data/users_deleted_null_login_${year}_pass2
+      curl $ZENDESK_URL/users/$clean_id -u $ZENDESK_USER_EMAIL:$ZENDESK_USER_PASSWORD -X DELETE
+      echo $clean_id >> data/users_deleted_null_login_${year}_pass2
     else
       echo "2019 detected"
-      # echo "$clean_id, $col2" >> data/users_not_deleted_${year}
+      echo "$clean_id, $col2" >> data/users_not_deleted_${year}
     fi
   else
     echo "2018 detected"
-    # echo "$clean_id, $col2" >> data/users_not_deleted_${year}
+    echo "$clean_id, $col2" >> data/users_not_deleted_${year}
   fi
 done < data/remote/users_not_deleted_${year}
