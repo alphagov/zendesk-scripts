@@ -1,11 +1,11 @@
 #!/bin/bash
 today=`date -I`
-source_file="data/latest-tickets-to-purge"
+source_file="latest-tickets-to-purge-${today}"
 echo "source: ${source_file}"
 
 
 if [ "${DRY_RUN+1}" ] ; then
-  for raw_id in `cat ${source_file}`
+  for raw_id in `cat data/${source_file}`
 		do
 			clean_id=`echo $raw_id | sed -e 's/\,//g' | sed -e 's/\]//g' | sed -e 's/\[//g'`
 			echo "*** DRY_RUN TICKET ID = $clean_id ***"
@@ -14,7 +14,7 @@ if [ "${DRY_RUN+1}" ] ; then
 
 else
 
-	for raw_id in `cat ${source_file}`
+	for raw_id in `cat data/${source_file}`
 		do
 			clean_id=`echo $raw_id | sed -e 's/\,//g' | sed -e 's/\]//g' | sed -e 's/\[//g'`
 			echo "REALLY DELETE"

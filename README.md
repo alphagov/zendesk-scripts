@@ -19,6 +19,7 @@ git clone git@github.com:alphagov/zendesk-scripts
 ### Installing ruby
 
 Install ruby and gems
+
 ```
 gem install bundler
 cd zendesk-scripts
@@ -100,7 +101,7 @@ data/delete_tickets_2013.sh
 ### User Processes
 
 
-#### Pull list of deleted user accounts to local file (note: incl. hard deleted so may take several hours)
+#### Retrieve list of deleted user accounts to local file (note: includes hard deleted so may take several hours)
 
 
 ```
@@ -114,6 +115,8 @@ bundle exec ruby lib/get-deleted-user-ids-to_local-file.rb
 ```
 bundle exec ruby lib/purge-users-using-local-file.rb | tee data/`date --iso-8601='date'`.log
 ```
+bundle exec ruby lib/count-closed-tickets-by-year.rb
+bundle exec ruby lib/get-latest-ticket-numbers.rb
 
 
 Notes
@@ -144,4 +147,3 @@ Suggested reading: [Good Contributing guide](https://gist.github.com/PurpleBooth
 ## License
 
 This project is licensed under the MIT License
-
