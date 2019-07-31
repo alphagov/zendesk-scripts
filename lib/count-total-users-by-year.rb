@@ -8,10 +8,10 @@ require 'zendesk_api'
   config.retry = true
 end
 
-today = Date.today.prev_day
+today = Date.today.next_day
 lastyear = today - 365
 
- puts "Total Tickets: #{@client.users.count}"
+puts "Total Users: #{@client.users.count}"
 
 puts "Total Users 2012"
 puts @client.search(:query => "type:user created_at>2012-01-01 created_at<2013-01-01").count
@@ -29,11 +29,5 @@ puts "Total Users 2017 Q2"
 puts @client.search(:query => "type:user created_at>2017-04-01 created_at<2017-07-01").count
 puts "Total Users 2017 Q3/4"
 puts @client.search(:query => "type:user created_at>2017-07-01 created_at<2018-01-01").count
-puts "Total Users 2018 Q1"
-puts @client.search(:query => "type:user created_at>2018-01-01 created_at<2018-04-01").count
 puts "Total Users 2018 upto one year ago tomorrow"
 puts @client.search(:query => "type:user created_at>2018-04-01 created_at<#{lastyear}").count
-
-# Count total users on the system
-puts "Total Users"
-puts @client.search(:query => "type:user")
