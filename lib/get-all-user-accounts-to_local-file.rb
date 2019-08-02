@@ -16,7 +16,7 @@ day = Date.today.prev_day
 lastyear = day - 365
 puts "last year:#{lastyear}"
 
-search_results = @client.search(:query => "type:user created_at<#{lastyear} updated_at<#{lastyear} role:end-user -name:Zendesk organization_id:none")
+search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization_id:none")
 
 # The Zendesk API has 100 items per page, so programatically
 # determine how many pages we have by rounding to the nearest 100.
