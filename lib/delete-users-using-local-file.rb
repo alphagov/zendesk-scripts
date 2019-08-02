@@ -104,15 +104,15 @@ file_data.each do |user|
     # soft delete
     puts "ok we're ready, DELETE this user: #{user_id}"
     puts "DELETE #{user_id}"
-    # @client.users.destroy!(:id => user_id)
+    @client.users.destroy!(:id => user_id)
     
     begin
     # api does not support hard delete yet, so...
-      RestClient::Request.execute method: :delete,
-        url: "#{ENV['ZENDESK_URL']}/deleted_users/#{user_id}.json",
-        user: ENV['ZENDESK_USER_EMAIL'], 
-        password: ENV['ZENDESK_USER_PASSWORD']
+    #  RestClient::Request.execute (method: :delete, url: "#{ENV['ZENDESK_URL']}/deleted_users/#{user_id}.json user: #{ENV['ZENDESK_USER_EMAIL']} password: #{ENV['ZENDESK_USER_PASSWORD']}")
   
+      RestClient::Request.execute method: :delete, url: "#{ENV['ZENDESK_URL']}/deleted_users/#{user_id}.json", user: ENV['ZENDESK_USER_EMAIL'], password: ENV['ZENDESK_USER_PASSWORD']
+
+
       rescue RestClient::UnprocessableEntity => api_error
         puts "Received HTTP 422 from ZenDesk API for user #{user_id} => #{api_error}"
         puts api_error.backtrace
