@@ -112,12 +112,18 @@ file_data.each do |user|
   
       RestClient::Request.execute method: :delete, url: "#{ENV['ZENDESK_URL']}/deleted_users/#{user_id}.json", user: ENV['ZENDESK_USER_EMAIL'], password: ENV['ZENDESK_USER_PASSWORD']
 
-
       rescue RestClient::UnprocessableEntity => api_error
         puts "Received HTTP 422 from ZenDesk API for user #{user_id} => #{api_error}"
         puts api_error.backtrace
         puts "Skipping over user #{user_id}"
       next
+
+      rescue RestClient::Error::NetworkError => api_error
+        puts "Received error from ZenDesk API for user #{user_id} => #{api_error}"
+        puts api_error.backtrace
+        puts "Skipping over user #{user_id}"
+      next
+
     end
   else
     puts "NOT DELETING #{user_id}"
