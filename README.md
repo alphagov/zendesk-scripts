@@ -6,14 +6,14 @@ Series of tasks to locate and remove legacy zendesk tickets and users to meet GD
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
 
-Clone the repo
+### Clone the repo
 
 ```
 git clone git@github.com:alphagov/zendesk-scripts
 ```
 
 
-### Prerequisites
+## Prerequisites
 
 Use of linux 'screen' command is highly recommended
 
@@ -23,13 +23,13 @@ Use dry run for testing
 export DRY_RUN=true
 ```
 
-ruby setup
+### ruby setup
 
 ```
 bundle exec rake -T 
 ```
 
-Add environmental variables to .bashrc
+### Add environmental variables to .bashrc
 ```
 # Vars for Zendesk
 export ZENDESK_USER_PASSWORD=[zendesk admin-user password]
@@ -38,12 +38,13 @@ export ZENDESK_URL=https://govuk.zendesk.com/api/v2
 ```
 
 
-## Testing
+
+### Testing
 
 Set the DRY_RUN variable and execute the scripts as per live process.
 
 
-## Process
+## Processes
 
 Start a 'screen' session, e.g.
 
@@ -51,14 +52,15 @@ Start a 'screen' session, e.g.
 screen -S "delete tickets 2013"
 ```
 
-### Tickets
+### Ticket Processes
+
 * Extract local files in /data directory per year of ticket_id's
 
 ```
 bundle exec ruby lib/get-annual-ticket-numbers.rb
 ```
 
-####   Results
+* Results
 
 Files are created per year, e.g.
 
@@ -80,9 +82,16 @@ data/delete_tickets_2013.sh
 * To resume the session
 
 ```
-screen -r [sessionname]
+screen -rd [sessionname]
 ```
 
+* Deal with latest tickets (upto 364 days ago - chosen to maintain GDPR for 24 hours rather than only for current moment)
+
+```
+bundle exec ruby lib/count-closed-tickets-by-year.rb
+bundle exec ruby lib/get-latest-ticket-numbers.rb
+
+DELETE THE SUCKERS :-)
 
 
 Notes
@@ -91,10 +100,19 @@ Notes
 * Check the API limitations, currently 700 requests / minute
 
 
-### Users
+### User Processes  tbc
+
 * Execute ruby script to remove selected users
 
-tbd ???
+## Hard Deleting soft-deleted users tbc
+
+### Pull list of deleted user accounts to local file (note: incl. hard deleted so may take several hours)
+
+```
+bundle exec ruby lib/get-deleted-user-ids-to_local-file.rb
+```
+
+
 
 
 
@@ -106,8 +124,8 @@ Please read [???](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for 
 
 ## Authors
 
-* **Issy Long** - Initial ruby work
-* **David Pye** - Refactor task into year chunks and some bashing
+* **Issy Long** - ruby consultancy and initial work
+* **David Pye** - Refactor task into year chunks and some bashing, plus prepare for automation
 
 
 ## License
