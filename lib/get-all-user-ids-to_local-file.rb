@@ -16,6 +16,8 @@ day = Date.today.prev_day
 lastyear = day - 365
 puts "last year:#{lastyear}"
 
+# TBC NEED TO LIMIT THE DATE RANGE AS 8000+ PAGES CURRENTLY!!!
+
 search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization_id:none")
 
 # The Zendesk API has 100 items per page, so programatically

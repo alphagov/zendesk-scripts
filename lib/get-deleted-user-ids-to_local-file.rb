@@ -22,6 +22,8 @@ end
 #   err.response
 # end
 
+# TBC NEED TO LIMIT THE DATE RANGE AS 8000+ PAGES CURRENTLY!!!
+
 begin
   url = "https://govuk.zendesk.com/api/v2/deleted_users.json"
   output_results = []
