@@ -19,7 +19,7 @@ day = Date.today.next_day
 lastyear = day - 365
 false_date = "2012-01-01"
 
-input_file = File.open "data/soft_deleted_users.page1-4"
+input_file = File.open "data/soft_deleted_users.json"
 
 # This works for single line test file
 # file = File.open input_file

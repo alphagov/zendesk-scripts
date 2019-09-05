@@ -18,7 +18,8 @@ end
 begin
   url = "https://govuk.zendesk.com/api/v2/deleted_users.json"
   output_results = []
-  while url != "https://govuk.zendesk.com/api/v2/deleted_users.json?page=5"
+  # while url != "https://govuk.zendesk.com/api/v2/deleted_users.json?page=5" ### This is fine for testing ###
+  while url do
     search_results = JSON.parse(RestClient::Request.execute method: :get, url: url, user: ENV['ZENDESK_USER_EMAIL'], password: ENV['ZENDESK_USER_PASSWORD'])
     (output_results << search_results['deleted_users']).flatten!
     puts search_results['next_page']
@@ -27,7 +28,7 @@ begin
   end
 end
 
-File.open("data/soft_deleted_users.page1-4", "w") { |file| file.write(JSON.generate(output_results)) }
+File.open("data/soft_deleted_users.json", "w") { |file| file.write(JSON.generate(output_results)) }
 
 
 
