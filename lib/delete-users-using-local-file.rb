@@ -14,32 +14,25 @@ end
 
 # diag = "false"
 diag = "true"
-
+url = "#{ENV['ZENDESK_URL']}/deleted_users/"
 day = Date.today.next_day
 lastyear = day - 365
 false_date = "2012-01-01"
 
-# Initialise input file
-
-input_file = "data/users-to-delete-TEST.jsonl"
-
-# puts Dir.pwd
-
-# Read from the file
-# file contains user accounts selected using
-# search(:query => "type:user created_at<#{lastyear} updated_at<#{lastyear} role:end-user -name:Zendesk organization_id:none")
-# so we only need to check last_login_at and no. of tickets > 0
+input_file = File.open "data/soft_deleted_users.page1-4"
 
 # This works for single line test file
 # file = File.open input_file
 # file_data = JSON.load file
 # file.close
 
+file_data = JSON.load input_file
 
-# json = JSON.parse(File.load("data/users-to-delete-TEST.jsonl"))
+# file_data = JSON.parse(File.read(input_file).to_json)
+# puts file_data
 
-file_data = JSON.parse(File.read('data/users-to-delete.jsonl'))
 file_data.each do |user|
+
 
   # Extract some fields
   updated_at = user["updated_at"]
@@ -75,21 +68,22 @@ file_data.each do |user|
     # diagnostics 
 
     if diag == "true"
-      # puts "day: #{day}"
-      # puts "lastyear: #{lastyear}"
+      puts "url: #{url}"
+      puts "day: #{day}"
+      puts "lastyear: #{lastyear}"
       puts "user_id: #{user_id}"
       puts "Name: #{name}"
+      puts "Active: #{active}"
       # puts "file_data: #{file_data}"
-      # puts "updated_at: #{updated_at}"
-      puts "updated: #{updated}"
-      # puts "last_login_at: #{last_login_at}"
+# ÷     puts "updated: #{updated}"
+      puts "last_login_at: #{last_login_at}"
       puts "last_login: #{last_login}"
     end
 
   # If last logged in < last year, let's check whether user has any tickets associated
 
     if last_login <= lastyear
-      puts "DELETE candidate - check tickets"
+      puts "Potential DELETION candidate - check tickets"
       count = @client.search!(:query => "requester_id:#{user_id}").count
       ticket_count = Integer count
       puts "ticket_count: #{ticket_count}"
@@ -103,14 +97,22 @@ file_data.each do |user|
   if ticket_count == 0
     # soft delete
     puts "ok we're ready, DELETE this user: #{user_id}"
-    puts "DELETE #{user_id}"
-    @client.users.destroy!(:id => user_id)
-    
+    puts "DELETE User ID: #{user_id}"
+
     begin
-    # api does not support hard delete yet, so...
+      @client.users.destroy!(:id => user_id)
+      rescue ZendeskAPI::Error::RecordInvalid => api_error
+        puts "Received error user #{user_id} already deleted"
+        puts "Skipping over user #{user_id}"
+      next
+    end
+
+
+    begin
+    # api does not support hard delete yet, so hard delete like this...
     #  RestClient::Request.execute (method: :delete, url: "#{ENV['ZENDESK_URL']}/deleted_users/#{user_id}.json user: #{ENV['ZENDESK_USER_EMAIL']} password: #{ENV['ZENDESK_USER_PASSWORD']}")
-  
-      RestClient::Request.execute method: :delete, url: "#{ENV['ZENDESK_URL']}/deleted_users/#{user_id}.json", user: ENV['ZENDESK_USER_EMAIL'], password: ENV['ZENDESK_USER_PASSWORD']
+      full_url = "#{url}#{user_id}.json"
+      RestClient::Request.execute method: :delete, url: full_url, user: ENV['ZENDESK_USER_EMAIL'], password: ENV['ZENDESK_USER_PASSWORD']
 
       rescue RestClient::UnprocessableEntity => api_error
         puts "Received HTTP 422 from ZenDesk API for user #{user_id} => #{api_error}"
@@ -118,13 +120,14 @@ file_data.each do |user|
         puts "Skipping over user #{user_id}"
       next
 
-      rescue RestClient::Error::NetworkError => api_error
+      rescue RestClient::Exception => api_error
         puts "Received error from ZenDesk API for user #{user_id} => #{api_error}"
         puts api_error.backtrace
         puts "Skipping over user #{user_id}"
       next
 
     end
+  
   else
     puts "NOT DELETING #{user_id}"
   end
