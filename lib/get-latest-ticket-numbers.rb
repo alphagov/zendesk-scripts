@@ -28,11 +28,12 @@ ticket_count_for_year = @client.search(:query => "type:ticket group_id:20188163 
 number_of_pages = (ticket_count_for_year.to_f / 100).ceil + 1
 
 (1..number_of_pages).each do |i|
+  # We use updated_at>2018 because we have removed ALL tickets before this date previously.
   @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2018-01-01 updated_at<#{lastyear}").page(i).each do |ticket|
     @latest_tickets << ticket['id']
   end
 end
 
-File.open("data/latest-tickets-to-purge-#{today}", "w") { |file| file.write(@latest_tickets) }
+File.open("data/latest-tickets-to-purge", "w") { |file| file.write(@latest_tickets) }
 
 exit
