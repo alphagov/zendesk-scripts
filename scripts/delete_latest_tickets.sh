@@ -14,7 +14,7 @@ if [ "${DRY_RUN+1}" ] ; then
 
 else
 
-	for raw_id in `cat data/${source_file}`
+	for raw_id in `cat ${source_file}`
 		do
 			clean_id=`echo $raw_id | sed -e 's/\,//g' | sed -e 's/\]//g' | sed -e 's/\[//g'`
 			echo "REALLY DELETE"
