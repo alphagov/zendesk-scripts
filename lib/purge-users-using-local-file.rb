@@ -16,7 +16,6 @@ diag = "true"
 url = "#{ENV['ZENDESK_URL']}/deleted_users/"
 day = Date.today.next_day
 lastyear = day - 365
-false_date = "2012-01-01"
 
 input_file = File.open "data/soft_deleted_users.json"
 
@@ -157,3 +156,5 @@ end
     #   next
 
     # end
+
+    # false_date = "2012-01-01"
