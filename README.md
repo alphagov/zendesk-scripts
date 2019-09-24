@@ -1,64 +1,89 @@
 # Zendesk Scripts
 
-Series of tasks to locate and remove legacy zendesk tickets and users to meet GDPR
+A collection of manual tasks (which will be autom8ed) to locate and remove legacy Zendesk tickets and user accounts to meet GDPR
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
+* These instructions will get the project up and running on your local machine for development and testing purposes.
+* It is highly recommended that an AWS VM is used for the longer tasks.
+* You will require a Zendesk account which has 'admin' privileges.
+* Use of linux 'screen' command is highly recommended
 
-Clone the repo
+### Clone the repo
 
 ```
 git clone git@github.com:alphagov/zendesk-scripts
 ```
 
 
-### Prerequisites
+### Installing ruby
 
-Use of linux 'screen' command is highly recommended
-
-Use dry run for testing
-
+Install ruby and gems
 ```
-export DRY_RUN=true
-```
-
-ruby setup
-
-```
-bundle exec rake -T 
+gem install bundler
+cd zendesk-scripts
+bundle install
+gem install rest-client
+gem install zendesk_api
+gem update
 ```
 
-Add environmental variables to .bashrc
+
+### Add environmental variables to .bashrc or to 'screen' session
+
 ```
 # Vars for Zendesk
-export ZENDESK_USER_PASSWORD=[zendesk admin-user password]
 export ZENDESK_USER_EMAIL=[zendesk admin-user email address]
+export ZENDESK_USER_PASSWORD=[zendesk admin-user password]
 export ZENDESK_URL=https://govuk.zendesk.com/api/v2
 ```
 
-
-## Testing
-
-Set the DRY_RUN variable and execute the scripts as per live process.
-
-
-## Process
-
-Start a 'screen' session, e.g.
+Start a 'screen' session and export vars, e.g.
 
 ```
-screen -S "delete tickets 2013"
+screen -S "tickets"
+export ZENDESK_USER_EMAIL=firstname.surname@digital.cabinet-office.gov.uk ; export ZENDESK_URL=https://govuk.zendesk.com/api/v2 ; export ZENDESK_USER_PASSWORD=[admin user password]
 ```
 
-### Tickets
+
+### Ticket Processes
+
+#### Retrieve and delete latest matching tickets (upto 364 days ago - date chosen to maintain GDPR for 24 hours rather than only for current moment)
+
+
+
+```
+screen -rd tickets       # Join existing screen session with vars exported and pwd=~ubuntu/zendesk-scripts.
+
+bundle exec ruby lib/get-latest-ticket-numbers.rb
+scripts/delete_latest_tickets.sh tee data/`tickets-date "+%FT%H:%M"`.log
+```
+
+Notes
+* Retrieve the GDPR-outstanding tickets to [pwd]/data/latest-tickets-to-purge] and then delete them.
+* The scripts should be run inside a screen session.
+* Deletion can take several hours (for e.g. 50,000 tickets) depending on quantities.
+* Check the API limitations, currently 700 requests / minute for ticket deletion, 70/min for user account hard deletion.
+
+
+
+#### Count existing tickets
+
+
+```
+bundle exec ruby lib/count-closed-tickets-by-year.rb
+```
+
+
+#### Removing historical tickets (once only, kept for reference)
+
 * Extract local files in /data directory per year of ticket_id's
 
 ```
 bundle exec ruby lib/get-annual-ticket-numbers.rb
 ```
 
-####   Results
+* Results
 
 Files are created per year, e.g.
 
@@ -71,7 +96,7 @@ Files are created per year, e.g.
 data/delete_tickets_2013.sh
 ```
 
-* Exit the session but leave the script running
+* Exit the 'screen' session but leave the script running
 ```
  ctrl+a
  d
@@ -80,39 +105,55 @@ data/delete_tickets_2013.sh
 * To resume the session
 
 ```
-screen -r [sessionname]
+screen -rd [sessionname]
 ```
 
 
+### User Processes
+
+
+#### Pull list of deleted user accounts to local file (note: incl. hard deleted so may take several hours)
+
+
+```
+bundle exec ruby lib/get-deleted-user-ids-to_local-file.rb
+
+```
+
+#### Hard delete (purge) qualifying accounts (may take many hours due to lower API rate)
+
+
+```
+bundle exec ruby lib/purge-users-using-local-file.rb | tee data/`date --iso-8601='date'`.log
+```
+
 
 Notes
-* The scripts should be run inside a screen session
-* Deletion takes several hours (for e.g. 50,000 tickets) depending on quantities and no. of scripts executing in parallel
-* Check the API limitations, currently 700 requests / minute
+* User account status can be either active, soft deleted or hard deleted.
+* The process must be to soft delete and then hard delete.
+* When retrieving the accounts, previously hard deleted accounts are included with soft deleted, making the sift of data a large task.
 
 
-### Users
-* Execute ruby script to remove selected users
+#### Count User accounts
 
-tbd ???
-
+```
+bundle exec ruby lib/count-users-by-year-for-deletion.rb
+```
 
 
 ## Contributing
 
-Please read [???](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+Suggested reading: [Good Contributing guide](https://gist.github.com/PurpleBooth/b24679402957c63ec426)
 
 
 
 ## Authors
 
-* **Issy Long** - Initial ruby work
-* **David Pye** - Refactor task into year chunks and some bashing
+* **Issy Long** - ruby consultancy and initial work
+* **David Pye** - Refactor task into year chunks and some bashing, plus prepare for automation
 
 
 ## License
 
 This project is licensed under the MIT License
-
-## Acknowledgments
 
