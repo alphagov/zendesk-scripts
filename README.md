@@ -23,9 +23,6 @@ Install ruby and gems
 gem install bundler
 cd zendesk-scripts
 bundle install
-gem install rest-client
-gem install zendesk_api
-gem update
 ```
 
 
@@ -97,16 +94,7 @@ data/delete_tickets_2013.sh
 ```
 
 * Exit the 'screen' session but leave the script running
-```
- ctrl+a
- d
-```
 
-* To resume the session
-
-```
-screen -rd [sessionname]
-```
 
 
 ### User Processes
