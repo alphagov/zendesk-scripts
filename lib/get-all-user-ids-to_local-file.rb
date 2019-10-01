@@ -20,11 +20,6 @@ search_results = @client.search(:query => "type:user role:end-user -name:Zendesk
 user_count =  search_results.count
 number_of_pages = (user_count.to_f / 100).ceil
 
-# For diagnosis
-
-puts "User Accounts: #{user_count}"
-puts "Pages of Users: #{number_of_pages}"
-
 # Loop through users matching criteria and 2 stage delete (soft then hard)
 (1..number_of_pages).each do |i|
   search_results.page(i).each do |user|

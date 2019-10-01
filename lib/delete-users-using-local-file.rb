@@ -10,7 +10,6 @@ require_relative 'zendesk-setup.rb'
 diag = "true"
 url = "#{ENV['ZENDESK_URL']}/deleted_users/"
 lastyear = Date.today.next_day - 365
-false_date = "2012-01-01"
 
 input_file = File.open "data/soft_deleted_users.json"
 
@@ -33,6 +32,8 @@ file_data.each do |user|
     # account is already soft deleted so force hard delete
     hard_delete = "true"
   end
+
+  false_date = "2012-01-01"
 
   if hard_delete != "true"
     if updated_at.nil?
