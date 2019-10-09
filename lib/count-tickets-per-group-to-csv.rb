@@ -22,7 +22,7 @@ File.open "data/groups.json" do |input_file|
     # Count total tickets per group
     group_total_tickets = @client.search(:query => "type:ticket group_id:#{group_id}").count.to_i
     # Count deletable tickets per group
-    group_deletable_tickets = @client.search(:query => "type:ticket group_id:#{group_id} organization_id:none status:closed updated_at>=2012-01-01 updated_at<=#{lastyear}").count.to_i
+    group_deletable_tickets = @client.search(:query => "type:ticket group_id:#{group_id} organization_id:none status:closed updated_at>=2012-01-01 updated_at<#{lastyear}").count.to_i
     # gsub replaces , with - so that csv import is clean
     puts "#{group_id},#{group_name.gsub(', ', '-')},#{group_total_tickets},#{group_deletable_tickets}"
   end
