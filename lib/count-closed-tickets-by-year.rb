@@ -2,21 +2,26 @@ require 'zendesk_api'
 
 require_relative 'zendesk-setup.rb'
 
+group_id = ENV['ZENDESK_GROUP']
+
 lastyear = Date.today.prev_day - 365
 
-puts "Total Tickets: #{@client.tickets.count}"
+current_year = Time.now.year
+year = 2012
+tickets = 0
+total_tickets = 0
 
-puts "Total Tickets 2012"
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2012-01-01 updated_at<2013-01-01").count.to_i
-puts "Total Tickets 2013"
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2013-01-01 updated_at<2014-01-01").count.to_i
-puts "Total Tickets 2014"
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2014-01-01 updated_at<2015-01-01").count.to_i
-puts "Total Tickets 2015"
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2015-01-01 updated_at<2016-01-01").count.to_i
-puts "Total Tickets 2016"
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2016-01-01 updated_at<2017-01-01").count.to_i
-puts "Total Tickets 2017"
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2017-01-01 updated_at<2018-01-01").count.to_i
-puts "Total Tickets 2018"
-puts @client.search(:query => "type:ticket group_id:20188163 status:closed updated_at>2018-01-01 updated_at<#{lastyear}").count.to_i
+puts "Deletable tickets by year"
+
+until year == current_year do
+  if lastyear.year == year then
+    tickets = @client.search(:query => "type:ticket group_id:#{group_id} status:closed organization_id:none updated_at>=#{year}-01-01 updated_at<#{lastyear}").count.to_i
+  else
+    tickets = @client.search(:query => "type:ticket group_id:#{group_id} status:closed organization_id:none updated_at>=#{year}-01-01 updated_at<#{year+1}-01-01").count.to_i
+  end
+  total_tickets += tickets
+  puts year.to_s+","+tickets.to_s
+  year += 1
+end
+
+puts "Total deletable tickets: #{total_tickets}"

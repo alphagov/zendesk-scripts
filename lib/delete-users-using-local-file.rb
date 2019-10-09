@@ -28,12 +28,15 @@ File.open "data/soft_deleted_users.json" do |input_file|
     # Convert strings to dates, if strings are nil then set a false date of 2012 so comparison works.
     # Booleans returned by API are not true boolean but strings.
 
+    hard_delete = "false"
+
     if active == "false"
       # account is already soft deleted so force hard delete
       hard_delete = "true"
     end
 
     false_date = "2012-01-01"
+    ticket_count = 0
 
     if hard_delete != "true"
       if updated_at.nil?
@@ -42,14 +45,10 @@ File.open "data/soft_deleted_users.json" do |input_file|
 
       # parse the date so we can do comparisons
 
-      updated = Date.parse(updated_at)
-
-      if last_login_at != nil
-        last_login = Date.parse(last_login_at)
-      else
+      if last_login_at.nil?
         last_login_at = false_date
-        last_login = Date.parse(last_login_at)
       end
+      last_login = Date.parse(last_login_at)
 
       # diagnostics 
 
@@ -63,7 +62,7 @@ File.open "data/soft_deleted_users.json" do |input_file|
         puts "lastyear: #{lastyear}"
       end
 
-    # If last logged in < last year, let's check whether user has any tickets associated
+      # If last logged in < last year, let's check whether user has any tickets associated
 
       if last_login <= lastyear
         puts "Potential DELETION candidate - check tickets"
@@ -73,8 +72,6 @@ File.open "data/soft_deleted_users.json" do |input_file|
       else
         puts "DO NOT DELETE"
       end
-    else
-    ticket_count = 0
     end
     
     if ticket_count == 0
@@ -91,7 +88,7 @@ File.open "data/soft_deleted_users.json" do |input_file|
       end
 
       begin
-      # api does not support hard delete yet, so hard delete like this...
+        # api does not support hard delete yet, so hard delete like this...
         full_url = "#{url}#{user_id}.json"
         RestClient::Request.execute method: :delete, url: full_url, user: ENV['ZENDESK_USER_EMAIL'], password: ENV['ZENDESK_USER_PASSWORD']
 

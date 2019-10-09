@@ -28,7 +28,7 @@ File.open "data/soft_deleted_users.json" do |input_file|
     active = user["active"]
     name = user["name"]
 
-    # Print some vars so we can corellate script actions & logic
+    # Print some vars so we can correlate script actions & logic
     if diag == "true"
       # puts "user: #{user.inspect}"
       puts "user_id: #{user_id}"
@@ -49,21 +49,20 @@ File.open "data/soft_deleted_users.json" do |input_file|
         puts "User #{user_id} already soft deleted, hard deleting..."
         begin
           # api does not support hard delete yet, so hard delete like this...
-            full_url = "#{url}#{user_id}.json"
-            RestClient::Request.execute method: :delete, url: full_url, user: ENV['ZENDESK_USER_EMAIL'], password: ENV['ZENDESK_USER_PASSWORD']
+          full_url = "#{url}#{user_id}.json"
+          RestClient::Request.execute method: :delete, url: full_url, user: ENV['ZENDESK_USER_EMAIL'], password: ENV['ZENDESK_USER_PASSWORD']
           
-            rescue RestClient::Exception => api_error
-              puts "Received error from ZenDesk API for user #{user_id} => #{api_error}"
-              puts api_error.backtrace
-              puts "Skipping over user #{user_id}"
-            next
+          rescue RestClient::Exception => api_error
+            puts "Received error from ZenDesk API for user #{user_id} => #{api_error}"
+            puts api_error.backtrace
+            puts "Skipping over user #{user_id}"
+          next
         end
       end
       puts "------------------------------------------------"
     else
       puts "NOT DELETING #{user_id} as already hard deleted"
       puts "------------------------------------------------"
-
     end
   end
 end
