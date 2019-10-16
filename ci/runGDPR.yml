@@ -1,0 +1,36 @@
+resources:
+- name: schedule
+  type: time
+  source:
+    start: 2:00 AM
+    stop: 9:00 PM
+
+jobs:
+- name: delete-gdpr-tickets
+  plan:
+  - get: schedule
+    trigger: true
+  - config:
+      container_limits: {}
+      image_resource:
+        source:
+          repository: "((readonly_private_ecr_repo_url))"
+          tag: concourse-gdpr-tickets-latest
+        type: docker-image
+      platform: linux
+      run:
+        args:
+        - -xce
+        - |
+          cd /usr/src/app
+          bundle install
+          bundle exec ruby /usr/src/app/lib/get-latest-ticket-numbers.rb
+          scripts/delete_latest_tickets.sh
+          bundle exec ruby /usr/src/app/lib/get-latest-ticket-numbers.rb
+
+        path: /bin/bash
+      params:
+        ZENDESK_URL: ((zendesk-url))
+        ZENDESK_USER_EMAIL: ((zendesk-email))
+        ZENDESK_USER_PASSWORD: ((zendesk-password))
+    task: run
