@@ -3,8 +3,8 @@ require 'zendesk_api'
 require_relative 'zendesk-setup.rb'
 
 today = Date.today
+lastyear = Date.today.next_day - 365
 directory = "data/all_groups"
-lastyear = Date.today.prev_day - 365
 directory_name = "#{directory}-#{today}"
 
 Dir.mkdir(directory_name) unless File.exists?(directory_name)
@@ -38,15 +38,20 @@ groups_list.each do |group|
   end
 end
 
-# Delete tickets returned
+# loop through tickets in each group file and delete
+# log_file copied to S3 bucket outside ruby script
 
 filenames = Dir.children(directory_name)
+log_file_name = ENV['ZENDESK_LOG_FILE']
 
-# loop through tickets in file and delete
-
-filenames.each do |file|
-  File.open("#{directory_name}/#{file}").each do |ticket_id|
-    puts "Deleting Ticket: #{ticket_id}"
-    @client.tickets.destroy!(:id => ticket_id.to_i)
+File.open(log_file_name, "w") {|log_file|
+  filenames.each do |file|
+    File.open("#{directory_name}/#{file}").each do |ticket_id|
+      message = "Deleting Ticket: #{ticket_id.gsub("\n", '')} from Group: #{file}"
+      puts message
+      log_file.puts message
+      @client.tickets.destroy!(:id => ticket_id.to_i)
+    end
   end
-end
+}
+puts "- - - - Zendesk Ticket deletion has completed - - - -"
