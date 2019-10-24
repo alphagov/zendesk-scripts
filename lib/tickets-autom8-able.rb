@@ -17,7 +17,7 @@ groups_list.each do |group|
   tickets = []
   ticket_count_for_period = 0
 
-  ticket_count_for_period = @client.search(:query => "type:ticket group_id:#{group_id} organization_id:none status:closed updated_at>=2012-01-01 updated_at<#{lastyear}").count.to_i
+  ticket_count_for_period = @client.search(:query => "type:ticket group:#{group_id} organization:none status:closed updated>=2012-01-01 updated<#{lastyear}").count.to_i
   puts "Deletable Tickets for Group: #{group_id} : #{ticket_count_for_period}"
   
   if ticket_count_for_period != 0
@@ -25,7 +25,7 @@ groups_list.each do |group|
     number_of_pages = (ticket_count_for_period.to_f / 100).ceil + 1
 
     (1..number_of_pages).each do |i|
-      @client.search(:query => "type:ticket group_id:#{group_id} organization_id:none status:closed updated_at>=2012-01-01 updated_at<#{lastyear}").page(i).each do |ticket|
+      @client.search(:query => "type:ticket group:#{group_id} organization:none status:closed updated>=2012-01-01 updated<#{lastyear}").page(i).each do |ticket|
         tickets << ticket['id']
       end
     end
