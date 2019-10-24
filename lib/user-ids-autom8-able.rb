@@ -1,3 +1,4 @@
+require 'zendesk_api'
 require 'rest-client'
 require 'json'
 
@@ -5,6 +6,27 @@ require_relative 'zendesk-setup.rb'
 
 lastyear = Date.today.next_day - 365
 source_user_file = "data/selected_user_ids_meeting_gdpr_params.json"
+
+search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created<=#{lastyear}")
+
+# The Zendesk API has 100 items per page, so programatically
+# determine how many pages we have by rounding to the nearest 100.
+# Retrieve all these users to a local file and then process locally.
+
+user_count =  search_results.count
+number_of_pages = (user_count.to_f / 100).ceil
+
+File.open(source_user_file, "w") do |file|
+
+# Loop through users matching criteria and 2 stage delete (soft then hard)
+
+  (1..number_of_pages).each do |i|
+    search_results.page(i).each do |user|
+      file.puts(user.to_json)
+    end
+  end
+end
+
 # some date fields have the value 'null' but we need to compare dates, so
 FALSE_DATE = "2012-01-01"
 
