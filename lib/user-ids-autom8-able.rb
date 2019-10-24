@@ -16,6 +16,8 @@ search_results = @client.search(:query => "type:user role:end-user -name:Zendesk
 user_count =  search_results.count
 number_of_pages = (user_count.to_f / 100).ceil
 
+puts "Retrieving #{user_count} user accounts, this may take a while"
+
 File.open(source_user_file, "w") do |file|
 
 # Loop through users matching criteria and 2 stage delete (soft then hard)
@@ -101,3 +103,4 @@ File.readlines(source_user_file).each do |line|
     end
   end
 end
+puts "- - - - Zendesk User Account deletion has completed - - - -"
