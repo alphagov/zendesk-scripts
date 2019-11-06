@@ -27,6 +27,10 @@ jobs:
           export ZENDESK_LOG_FILE="zendesk-GDPR-tickets.`date +%Y-%m-%d`"
           bundle exec ruby /usr/src/app/lib/tickets-autom8-able.rb
           aws s3 cp $ZENDESK_LOG_FILE s3://${S3_BUCKET_NAME}/
+          export ZENDESK_LOG_FILE="zendesk-GDPR-users.`date +%Y-%m-%d`"
+          bundle exec ruby /usr/src/app/lib/user-ids-autom8-able.rb
+          aws s3 cp $ZENDESK_LOG_FILE s3://${S3_BUCKET_NAME}/
+
         path: /bin/bash
       params:
         S3_BUCKET_NAME: ((readonly_private_bucket_name))
