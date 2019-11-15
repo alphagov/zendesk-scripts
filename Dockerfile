@@ -5,8 +5,8 @@ WORKDIR /usr/src/app
 RUN apt-get update && \
     apt-get -y install build-essential git curl python3-pip && \
     apt-get clean && \
-    pip3 install awscli
-
-RUN cd $WORKDIR
+    pip3 install awscli 
 
 RUN git clone https://github.com/alphagov/zendesk-scripts.git .
+
+RUN bundle install
