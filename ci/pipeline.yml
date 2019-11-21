@@ -14,10 +14,10 @@ resources:
     start: "01:00 AM"
     stop: "05:00 AM"
 
-- name: gdpr-tickets-repository
+- name: gdpr-repository
   type: docker-image
   source:
-    repository: ((readonly_private_ecr_repo_url))
+    repository: "((readonly_private_ecr_repo_url))"
     tag: concourse-gdpr-tickets-latest
 
 jobs: 
@@ -26,10 +26,9 @@ jobs:
   plan: 
   - get: zendesk-scripts
     trigger: true
-  - put: gdpr-tickets-repository
+  - put: gdpr-repository
     params:
       build: build-gdpr
-      dockerfile: build-gdpr/Dockerfile
 
 - name: delete-tickets-and-user-accounts
   serial: true
@@ -39,7 +38,7 @@ jobs:
   - config: 
       image_resource: 
         source: 
-          repository: ((readonly_private_ecr_repo_url))
+          repository: "((readonly_private_ecr_repo_url))"
           tag: concourse-gdpr-tickets-latest
         type: docker-image
       platform: linux
