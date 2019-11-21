@@ -5,7 +5,7 @@ require 'json'
 require_relative 'zendesk-setup.rb'
 
 lastyear = Date.today.next_day - 365
-source_user_file = "data/selected_user_ids_meeting_gdpr_params-TEST.json"
+source_user_file = "data/selected_user_ids_meeting_gdpr_params.json"
 
 def hard_delete(user_id, url, log_file)
   message = "Hard deleting user_id: #{user_id}"
@@ -65,8 +65,6 @@ File.open(log_file_name, "w") do |log_file|
     last_login_at = user["last_login_at"]
     user_id = user["id"]
     active = user["active"]
-
-    puts "active is:- #{active}"
 
     # base URL for soft / hard delted user accounts
     url = "#{ENV['ZENDESK_URL']}/deleted_users/"
