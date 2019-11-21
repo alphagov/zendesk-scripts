@@ -7,6 +7,27 @@ require_relative 'zendesk-setup.rb'
 lastyear = Date.today.next_day - 365
 source_user_file = "data/selected_user_ids_meeting_gdpr_params.json"
 
+def hard_delete(user_id, url, log_file)
+  message = "Hard deleting user_id: #{user_id}"
+  puts message
+  log_file.puts message
+
+  begin
+    # api does not support hard delete yet, so hard delete like this...
+    full_url = "#{url}#{user_id}.json"
+    puts "full_url: #{full_url}"
+    RestClient::Request.execute(method: :delete, url: full_url, user: ENV['ZENDESK_USER_EMAIL']+'/token', password: ENV['ZENDESK_TOKEN'])
+
+  rescue RestClient::Exception => api_error
+    message = "Received error from ZenDesk API Skipping over user #{user_id} => #{api_error}"
+    puts message
+    log_file.puts message
+
+    return false
+  end
+  return true
+end
+
 search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created<=#{lastyear}")
 
 # The Zendesk API has 100 items per page, so programatically
@@ -45,32 +66,27 @@ File.open(log_file_name, "w") do |log_file|
     user_id = user["id"]
     active = user["active"]
 
-    # is user account already soft deleted, if so, fast track to hard delete
-    if active != "true"
+    # base URL for soft / hard delted user accounts
+    url = "#{ENV['ZENDESK_URL']}/deleted_users/"
+
+    # is user account already soft deleted, if so, hard delete
+    if active.to_s == "false"
       message = "user account #{user_id} is already soft deleted"
       puts message
       log_file.puts message
-
-      updated_at = FALSE_DATE
-      last_login_at = FALSE_DATE
-    else
-      # user account is NOT soft deleted, so test for null dates and set false date
-      if updated_at.nil?
-        updated_at = FALSE_DATE
-      end
-
-      if last_login_at.nil?
-        last_login_at = FALSE_DATE
-      end
-
+      hard_delete(user_id, url, log_file)
+      next
     end
 
-    # parse dates so we can do comparisons
+    # Prepare and parse dates so we can do comparisons
+    if updated_at.nil?
+      updated_at = FALSE_DATE
+    end
+    if last_login_at.nil?
+      last_login_at = FALSE_DATE
+    end
     updated = Date.parse(updated_at)
     last_login = Date.parse(last_login_at)
-
-    # base URL for soft / hard delted user accounts
-    url = "#{ENV['ZENDESK_URL']}/deleted_users/"
 
     if last_login <= lastyear
       if updated <= lastyear
@@ -91,32 +107,13 @@ File.open(log_file_name, "w") do |log_file|
             @client.users.destroy!(:id => user_id)
 
           rescue ZendeskAPI::Error::RecordInvalid => api_error
-            message = "Received error user #{user_id} already deleted, skipping over"
+            message = "Received error user #{user_id} already deleted, skipping over. Details: #{api_error.backtrace}"
             puts message
             log_file.puts message
             next
-
           end
 
-          message = "Hard deleting user_id: #{user_id}"
-          puts message
-          log_file.puts message
-
-          begin
-            # api does not support hard delete yet, so hard delete like this...
-            full_url = "#{url}#{user_id}.json"
-            puts "full_url: #{full_url}"
-            RestClient::Request.execute(method: :delete, url: full_url, user: ENV['ZENDESK_USER_EMAIL']+'/token', password: ENV['ZENDESK_TOKEN'])
-
-          rescue RestClient::Exception => api_error
-            message = "Received error from ZenDesk API Skipping over user #{user_id} => #{api_error}"
-            puts message
-            log_file.puts message
-
-            puts api_error.backtrace
-            next
-
-          end
+          hard_delete(user_id, url, log_file)
 
         else
           message = "user_id: #{user_id} has #{ticket_count} tickets, not deleting"
