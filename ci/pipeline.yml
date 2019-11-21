@@ -29,6 +29,7 @@ jobs:
   - put: gdpr-tickets-repository
     params:
       build: build-gdpr
+      dockerfile: build-gdpr/Dockerfile
 
 - name: delete-tickets-and-user-accounts
   serial: true
