@@ -28,27 +28,27 @@ def hard_delete(user_id, url, log_file)
   return true
 end
 
-# search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created<=#{lastyear}")
+search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created<=#{lastyear}")
 
 # The Zendesk API has 100 items per page, so programatically
 # determine how many pages we have by rounding to the nearest 100.
 # Retrieve all these users to a local file and then process locally.
 
-# user_count =  search_results.count
-# number_of_pages = (user_count.to_f / 100).ceil
+user_count =  search_results.count
+number_of_pages = (user_count.to_f / 100).ceil
 
-# puts "Retrieving #{user_count} user accounts, this may take a while"
+puts "Retrieving #{user_count} user accounts, this may take a while"
 
-# File.open(source_user_file, "w") do |file|
+File.open(source_user_file, "w") do |file|
 
-# # Loop through users matching criteria and 2 stage delete (soft then hard)
+# Loop through users matching criteria and 2 stage delete (soft then hard)
 
-#   (1..number_of_pages).each do |i|
-#     search_results.page(i).each do |user|
-#       file.puts(user.to_json)
-#     end
-#   end
-# end
+  (1..number_of_pages).each do |i|
+    search_results.page(i).each do |user|
+      file.puts(user.to_json)
+    end
+  end
+end
 
 # some date fields have the value 'null' but we need to compare dates, so
 FALSE_DATE = "2012-01-01"
@@ -115,10 +115,7 @@ File.open(log_file_name, "w") do |log_file|
             next
           end
 
-          # HARD DELETE
-          if !hard_delete(user_id, url, log_file)
-            next
-          end
+          hard_delete(user_id, url, log_file)
 
         else
           message = "user_id: #{user_id} has #{ticket_count} tickets, not deleting"
@@ -131,6 +128,3 @@ File.open(log_file_name, "w") do |log_file|
   end
 end
 puts "- - - - Zendesk User Account deletion has completed - - - -"
-
-
-
