@@ -28,7 +28,7 @@ jobs:
     trigger: true
   - put: gdpr-repository
     params:
-      build: build-gdpr
+      build: zendesk-scripts
 
 - name: delete-tickets-and-user-accounts
   serial: true
