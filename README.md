@@ -25,8 +25,6 @@ A collection of scripts and pipelines to locate and remove legacy Zendesk ticket
 * No. of tickets belonging to user = 0
 
 
-
-
 ## Getting Started
 
 * These instructions will get the project up and running on your local machine for development and testing purposes.
@@ -52,14 +50,18 @@ Download and install correct version of 'fly'
 
 #### Login to selected Concourse
 
+e.g. 
+
 ```
-fly --target [target-name] login --team-name [team] --concourse-url [concourse-url]
+fly --target cd-autom8 login --team-name autom8 --concourse-url https://cd.gds-reliability.engineering
 ```
 
 
 #### Secure required secrets
 
-Run 'show-available-pipeline-variables' found inside the 'info' pipeline and follow instructions for the following secrets:
+Run 'show-available-pipeline-variables' found inside the 'info' pipeline and be prepared to perform the next step.
+
+Follow the instructions to hijack the container and add 'per pipeline' entries for the following secrets:
 
 * ZENDESK_USER_EMAIL
 * ZENDESK_URL
