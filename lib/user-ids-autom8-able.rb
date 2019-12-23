@@ -66,6 +66,15 @@ File.open(log_file_name, "w") do |log_file|
     user_id = user["id"]
     active = user["active"]
 
+    # is the user a shared agent (connected to another zendesk account)
+    # then skip as we cannot delete them
+    if user["shared_agent"]
+      message = "user account #{user_id} cannot be deleted as it is marked as a 'shared_agent' from another zendesk account"
+      puts messsage
+      log_file.puts message
+      next
+    end
+
     # base URL for soft / hard delted user accounts
     url = "#{ENV['ZENDESK_URL']}/deleted_users/"
 
