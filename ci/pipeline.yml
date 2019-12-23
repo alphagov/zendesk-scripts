@@ -1,15 +1,15 @@
-resources: 
+resources:
 - name: zendesk-scripts
   type: git
   icon: github-circle
-  source: 
+  source:
     branch: master
     uri: "https://github.com/alphagov/zendesk-scripts.git"
 
 - name: nightly
   type: time
   icon: alarm
-  source: 
+  source:
     location: Europe/London
     start: "01:00 AM"
     stop: "05:00 AM"
@@ -20,10 +20,10 @@ resources:
     repository: "((readonly_private_ecr_repo_url))"
     tag: concourse-gdpr-tickets-latest
 
-jobs: 
+jobs:
 - name: build-zendesk-GDPR-cleaner
   serial: true
-  plan: 
+  plan:
   - get: zendesk-scripts
     trigger: true
   - put: gdpr-repository
@@ -32,18 +32,18 @@ jobs:
 
 - name: delete-tickets-and-user-accounts
   serial: true
-  plan: 
+  plan:
   - get: nightly
     trigger: true
-  - config: 
-      image_resource: 
-        source: 
-          repository: "((readonly_private_ecr_repo_url))"
-          tag: concourse-gdpr-tickets-latest
-        type: docker-image
+  - get: gdpr-repository
+    trigger: true
+    passed: [build-zendesk-GDPR-cleaner]
+  - task: run
+    image: gdpr-repository
+    config:
       platform: linux
-      run: 
-        args: 
+      run:
+        args:
         - -xce
         - |
           cd /usr/src/app
@@ -54,12 +54,11 @@ jobs:
           bundle exec ruby /usr/src/app/lib/user-ids-autom8-able.rb
           aws s3 cp $ZENDESK_LOG_FILE s3://${S3_BUCKET_NAME}/
         path: /bin/bash
-      params: 
+      params:
         S3_BUCKET_NAME: ((readonly_private_bucket_name))
         ZENDESK_URL: ((zendesk-url))
         ZENDESK_USER_EMAIL: ((zendesk-email))
         ZENDESK_TOKEN: ((zendesk-token))
-    task: run
 
   - task: cronitor-zendesk-GDPR-cleaner
     timeout: 1m
