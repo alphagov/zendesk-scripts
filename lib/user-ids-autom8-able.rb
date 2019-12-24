@@ -70,7 +70,7 @@ File.open(log_file_name, "w") do |log_file|
     # then skip as we cannot delete them
     if user["shared_agent"]
       message = "user account #{user_id} cannot be deleted as it is marked as a 'shared_agent' from another zendesk account"
-      puts messsage
+      puts message
       log_file.puts message
       next
     end
