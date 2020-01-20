@@ -128,8 +128,6 @@ File.open(log_file_name, "w") do |log_file|
             raise
           end
 
-
-
           hard_delete(user_id, url, log_file)
 
         else
