@@ -120,7 +120,15 @@ File.open(log_file_name, "w") do |log_file|
             puts message
             log_file.puts message
             next
+
+          rescue ZendeskAPI::Error::NetworkError => api_error
+            message = "Received network error, check user #{user_id}, skipping over. Details: #{api_error.backtrace}"
+            puts message
+            log_file.puts message
+            raise
           end
+
+
 
           hard_delete(user_id, url, log_file)
 
