@@ -195,16 +195,10 @@ Notes
 bundle exec ruby lib/count-users-by-year-for-deletion.rb
 ```
 
-#### Create groups (json and text)
+#### Create groups.json
 
-json
 ```
 curl $ZENDESK_URL/groups.json -v -u "$ZENDESK_USER_EMAIL/token:$ZENDESK_TOKEN" > data/groups.json
-```
-
-text
-```
-bundle exec ruby lib/get-groups-list-to-file.rb
 ```
 
 #### Create custom_roles (json and text)
