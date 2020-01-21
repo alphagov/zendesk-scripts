@@ -6,7 +6,7 @@ require_relative 'zendesk-setup.rb'
 
 output_file = "data/custom-roles.out"
 
-File.open("#{output_file}", "w") do |file|
+File.open(output_file, "w") do |file|
 
   custom_roles_list = @client.custom_roles
 
