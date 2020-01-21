@@ -198,21 +198,25 @@ bundle exec ruby lib/count-users-by-year-for-deletion.rb
 #### Create groups (json and text)
 
 json
-
 ```
 curl $ZENDESK_URL/groups.json -v -u "$ZENDESK_USER_EMAIL/token:$ZENDESK_TOKEN" > data/groups.json
 ```
 
 text
-
 ```
 bundle exec ruby lib/get-groups-list-to-file.rb
 ```
 
-#### Create custom_roles.json
+#### Create custom_roles (json and text)
 
+json
 ```
 curl $ZENDESK_URL/custom_roles.json -v -u "$ZENDESK_USER_EMAIL/token:$ZENDESK_TOKEN" > data/custom_roles.json
+```
+
+text
+```
+bundle exec ruby lib/get-custom-roles-list-to-file.rb
 ```
 
 #### Retrieve Agents
