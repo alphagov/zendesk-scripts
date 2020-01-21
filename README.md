@@ -195,10 +195,24 @@ Notes
 bundle exec ruby lib/count-users-by-year-for-deletion.rb
 ```
 
-#### Create groups.json
+#### Create groups (json and text)
+
+json
 
 ```
 curl $ZENDESK_URL/groups.json -v -u "$ZENDESK_USER_EMAIL/token:$ZENDESK_TOKEN" > data/groups.json
+```
+
+text
+
+```
+bundle exec ruby lib/get-groups-list-to-file.rb
+```
+
+#### Create custom_roles.json
+
+```
+curl $ZENDESK_URL/custom_roles.json -v -u "$ZENDESK_USER_EMAIL/token:$ZENDESK_TOKEN" > data/custom_roles.json
 ```
 
 #### Retrieve Agents
@@ -208,7 +222,7 @@ bundle exec ruby lib/get-all-agents.rb > data/agents.json
 
 #### Select and convert json to csv
 ```
-jq -r '.name + "," + .role + "," + (.default_group_id|tostring) + "," + (.active|tostring)' agents.json > agents.csv
+jq -r '.name + "," + .role + "," + (.default_group_id|tostring) + "," + (.active|tostring) + "," + (.custom_role_id|tostring)' data/agents.json > data/agents.csv
 ```
 
 #### Merge Agent and Group Description
