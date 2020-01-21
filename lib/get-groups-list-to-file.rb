@@ -6,7 +6,7 @@ require_relative 'zendesk-setup.rb'
 
 output_file = "data/groups.out"
 
-File.open("#{output_file}", "w") do |file|
+File.open(output_file, "w") do |file|
 
   groups_list = @client.groups
 
