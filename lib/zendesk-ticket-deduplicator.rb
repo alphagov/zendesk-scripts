@@ -6,7 +6,7 @@ require 'json'
 puts "Total Users on the system: #{@client.users.count}"
 
 # Change date to 2020-01-01
-search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=2020-04-13")
+search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=2020-04-15")
 
 user_count =  search_results.count
 number_of_pages = (user_count.to_f / 100).ceil
@@ -42,7 +42,7 @@ File.open(log_file_name, "w") do |log_file|
     # active = user["active"]
 
     # Count tickets for this user
-    count = @client.search!(:query => "type:ticket requester:#{user_id}").count
+    count = @client.search!(:query => "type:ticket requester:#{user_id} -status:closed -status:solved").count
     ticket_count = Integer count
 
     # Message and log the result
@@ -52,10 +52,11 @@ File.open(log_file_name, "w") do |log_file|
 
     # If user has > 1 ticket, it's a candidate, if active, move user's tickets to new queue "Testing--Filtering group"
     if ticket_count > 1
-      tickets = @client.search!(:query => "type:ticket requester:#{user_id}")
+      tickets = @client.search!(:query => "type:ticket requester:#{user_id} -status:closed -status:solved")
       ticket_index = 0
       ticket_id = []
       ticket_status = []
+
       new_group_id = 20395446
       url = "#{ENV['ZENDESK_URL']}/tickets/"
 
@@ -73,6 +74,8 @@ File.open(log_file_name, "w") do |log_file|
 
         # Prepare ticket Status
         ticket_status[ticket_index] = tickets[ticket_index].status
+
+        puts "DEBUG: ticket_status= #{ticket_status}"
 
         # Construct URL
         full_url = "#{url}#{ticket_id[ticket_index]}.json"
@@ -95,3 +98,7 @@ File.open(log_file_name, "w") do |log_file|
     end
   end
 end
+
+# legacy
+# status_test = ticket_status.group_by(&:itself).transform_values(&:count)
+# puts "DEBUG: ticket_status: #{status_test}"
