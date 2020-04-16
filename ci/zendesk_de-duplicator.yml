@@ -1,0 +1,56 @@
+resources:
+- name: zendesk-scripts
+  type: git
+  icon: github-circle
+  source:
+    branch: master
+    uri: "https://github.com/alphagov/zendesk-scripts.git"
+
+- name: hourly
+  type: time
+  icon: alarm
+  source:
+    location: {interval: 1h}
+
+- name: dedupe-repository
+  type: docker-image
+  source:
+    repository: "((readonly_private_ecr_repo_url))"
+    tag: concourse-dedupe-tickets-latest
+jobs:
+- name: build-zendesk-deduplicator
+  serial: true
+  plan:
+  - get: zendesk-scripts
+    trigger: true
+  - put: dedupe-repository
+    params:
+      build: zendesk-scripts
+
+- name: dedupe-tickets
+  serial: true
+  plan:
+  - get: hourly
+    trigger: true
+  - get: dedupe-repository
+    trigger: true
+    passed: [build-zendesk-deduplicator]
+  - task: run
+    image: dedupe-repository
+    config:
+      platform: linux
+      run:
+        args:
+        - -xce
+        - |
+          cd /usr/src/app
+          export ZENDESK_LOG_FILE=zendesk-dedupe-tickets.`date +%Y-%m-%d%H%M`
+          bundle exec ruby /usr/src/app/lib/zendesk-ticket-deduplicator.rb
+          aws s3 cp $ZENDESK_LOG_FILE s3://${S3_BUCKET_NAME}/
+        path: /bin/bash
+      params:
+        S3_BUCKET_NAME: ((readonly_private_bucket_name))
+        ZENDESK_URL: ((zendesk-url))
+        ZENDESK_USER_EMAIL: ((zendesk-email))
+        ZENDESK_TOKEN: ((zendesk-token))
+

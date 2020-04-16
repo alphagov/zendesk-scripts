@@ -3,10 +3,14 @@ require_relative 'zendesk-setup.rb'
 require 'rest-client'
 require 'json'
 
-puts "Total Users on the system: #{@client.users.count}"
+# puts "Total Users on the system: #{@client.users.count}"
+minus_1_hr = Time.now - 2 * 3600
+time_minus_1_hr = minus_1_hr.strftime('%Y-%m-%dT%H:%M:%S%z')
+
+puts "time: #{time_minus_1_hr}"
 
 # Change date to 2020-01-01
-search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=2020-04-15")
+search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=#{time_minus_1_hr}")
 
 user_count =  search_results.count
 number_of_pages = (user_count.to_f / 100).ceil
@@ -35,11 +39,6 @@ File.open(log_file_name, "w") do |log_file|
   File.readlines(results_file).each do |line|
     user = JSON.parse(line)
     user_id = user["id"]
-
-    # Extract some fields
-    # updated_at = user["updated_at"]
-    # last_login_at = user["last_login_at"]
-    # active = user["active"]
 
     # Count tickets for this user
     count = @client.search!(:query => "type:ticket requester:#{user_id} -status:closed -status:solved").count
@@ -75,8 +74,6 @@ File.open(log_file_name, "w") do |log_file|
         # Prepare ticket Status
         ticket_status[ticket_index] = tickets[ticket_index].status
 
-        puts "DEBUG: ticket_status= #{ticket_status}"
-
         # Construct URL
         full_url = "#{url}#{ticket_id[ticket_index]}.json"
 
@@ -98,7 +95,3 @@ File.open(log_file_name, "w") do |log_file|
     end
   end
 end
-
-# legacy
-# status_test = ticket_status.group_by(&:itself).transform_values(&:count)
-# puts "DEBUG: ticket_status: #{status_test}"
