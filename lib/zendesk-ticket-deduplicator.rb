@@ -4,13 +4,11 @@ require 'rest-client'
 require 'json'
 
 # puts "Total Users on the system: #{@client.users.count}"
-minus_1_hr = Time.now - 2 * 3600
-time_minus_1_hr = minus_1_hr.strftime('%Y-%m-%dT%H:%M:%S%z')
-
-puts "time: #{time_minus_1_hr}"
+minus_2_hrs = Time.now - 2 * 3600
+start_time = minus_2_hrs.strftime('%Y-%m-%dT%H:%M:%S%z')
 
 # Change date to 2020-01-01
-search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=#{time_minus_1_hr}")
+search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=#{start_time}")
 
 user_count =  search_results.count
 number_of_pages = (user_count.to_f / 100).ceil
@@ -19,7 +17,6 @@ puts "Number of User accounts (UIDs): #{user_count}"
 puts "Number of pages of UIDs: #{number_of_pages}"
 puts "Retrieving #{user_count} user accounts, this may take a while"
 
-# Reset name after testing - Set Logfile name
 results_file = "data/2020_user_ids.json"
 
 # Loop through users and write to file in JSON format

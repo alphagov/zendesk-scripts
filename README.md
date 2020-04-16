@@ -240,9 +240,11 @@ sh scripts/merge-agent-and-group-description.sh
 #### De-duplicate support queue - manual script
 
 * Add local ZENDESK_LOG_FILE environmental Var as above.
-* Edit date required in this line:
+* Edit date required in this line, e.g.:
 ```
-search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=2020-04-13")
+- search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=#{start_time}")
+
++ search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=2020-04-13")
 ```
 * Execute script
 ```
