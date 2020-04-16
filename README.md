@@ -98,6 +98,7 @@ export ZENDESK_USER_EMAIL=[zendesk admin-user email address]
 export ZENDESK_USER_PASSWORD=[zendesk admin-user password]
 export ZENDESK_URL=https://govuk.zendesk.com/api/v2
 export ZENDESK_TOKEN=[token-string]
+export ZENDESK_LOG_FILE=zendesk-GDPR-users-log.`date +%Y-%m-%d`
 ```
 
 Start a 'screen' session and export vars, e.g.
@@ -232,6 +233,22 @@ jq -r '.name + "," + .role + "," + (.default_group_id|tostring) + "," + (.active
 #### Merge Agent and Group Description
 ```
 sh scripts/merge-agent-and-group-description.sh
+```
+
+### Adhoc Scripts
+
+#### De-duplicate support queue - manual script
+
+* Add local ZENDESK_LOG_FILE environmental Var as above.
+* Edit date required in this line, e.g.:
+```
+- search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=#{start_time}")
+
++ search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=2020-04-13")
+```
+* Execute script
+```
+bundle exec ruby lib/zendesk-ticket-deduplicator.rb
 ```
 
 
