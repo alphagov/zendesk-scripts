@@ -9,7 +9,8 @@ resources:
 - name: hourly
   type: time
   icon: alarm
-  source: {interval: 1h}
+  source:
+    interval: 1h
 
 - name: dedupe-repository
   type: docker-image
