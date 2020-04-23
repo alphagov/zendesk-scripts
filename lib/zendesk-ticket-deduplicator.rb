@@ -4,8 +4,8 @@ require 'rest-client'
 require 'json'
 
 # Setup time window
-minus_2_hrs = Time.now - 2 * 3600
-start_time = minus_2_hrs.strftime('%Y-%m-%dT%H:%M:%S%z')
+window_start_time = Time.now - 2 * 3600
+start_time = window_start_time.strftime('%Y-%m-%dT%H:%M:%S%z')
 
 # Change date to 2020-01-01
 search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=#{start_time}")

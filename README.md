@@ -243,7 +243,7 @@ The purpose of this script is to identify multiple tickets from the same UserID 
 Edit window required (e.g. 12 hours) in this line, e.g.:
 ```
 
-minus_2_hrs = Time.now - 12 * 3600
+window_start_time = Time.now - 12 * 3600
 
 ```
 Execute script
