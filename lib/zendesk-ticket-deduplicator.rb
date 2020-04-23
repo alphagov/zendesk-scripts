@@ -26,19 +26,21 @@ File.open(results_file, "w") do |file|
   end
 end
 
+first_line_group = 20188163
+
 # Open the source file for reading
 File.readlines(results_file).each do |line|
   user = JSON.parse(line)
   user_id = user["id"]
 
   # Count tickets for this user
-  count = @client.search!(:query => "type:ticket requester:#{user_id} -status:closed -status:solved").count
+  count = @client.search!(:query => "type:ticket group_id:#{first_line_group} requester:#{user_id} -status:closed -status:solved").count
   ticket_count = Integer count
   puts "User ID: #{user_id} has #{ticket_count} ticket/s"
 
   # If user has > 1 ticket, it's a candidate, if active, move user's tickets to new queue "Testing--Filtering group"
   if ticket_count > 1
-    tickets = @client.search!(:query => "type:ticket requester:#{user_id} -status:closed -status:solved")
+    tickets = @client.search!(:query => "type:ticket group_id:#{first_line_group} requester:#{user_id} -status:closed -status:solved")
     ticket_index = 0
     ticket_id = []
     ticket_status = []
@@ -56,11 +58,10 @@ File.readlines(results_file).each do |line|
       ticket_status[ticket_index] = tickets[ticket_index].status
       # Construct URL
       full_url = "#{url}#{tickets[ticket_index].id}.json"
-
-        # For debug
-        puts "Moving ticket - user_id: #{user_id} | ticket_id: #{ticket_id[ticket_index]} | full_url: #{full_url} | status: #{ticket_status[ticket_index]}"
-        # Move the ticket
-        RestClient::Request.execute(method: :put, url: full_url, user: ENV['ZENDESK_USER_EMAIL']+'/token', password: ENV['ZENDESK_TOKEN'], payload: ticket_to_update)
+      # For debug
+      puts "Moving ticket - user_id: #{user_id} | ticket_id: #{ticket_id[ticket_index]} | full_url: #{full_url} | status: #{ticket_status[ticket_index]}"
+      # Move the ticket
+      RestClient::Request.execute(method: :put, url: full_url, user: ENV['ZENDESK_USER_EMAIL']+'/token', password: ENV['ZENDESK_TOKEN'], payload: ticket_to_update)
       # Next ticket
       ticket_index += 1
     end
