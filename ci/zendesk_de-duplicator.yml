@@ -6,11 +6,13 @@ resources:
     branch: master
     uri: "https://github.com/alphagov/zendesk-scripts.git"
 
-- name: hourly
+- name: schedule
   type: time
   icon: alarm
   source:
-    interval: 1h
+    interval: 6h
+    start: 6:00 AM
+    stop: 8:00 PM
 
 - name: dedupe-repository
   type: docker-image
@@ -30,7 +32,7 @@ jobs:
 - name: dedupe-tickets
   serial: true
   plan:
-  - get: hourly
+  - get: schedule
     trigger: true
   - get: dedupe-repository
     trigger: true
@@ -47,6 +49,6 @@ jobs:
           bundle exec ruby /usr/src/app/lib/zendesk-ticket-deduplicator.rb
         path: /bin/bash
       params:
-        ZENDESK_URL: ((zendesk-url))
+        ZENDESK_URL: https://govuk.zendesk.com/api/v2
         ZENDESK_USER_EMAIL: ((zendesk-email))
         ZENDESK_TOKEN: ((zendesk-token))
