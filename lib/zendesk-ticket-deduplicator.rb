@@ -3,8 +3,8 @@ require_relative 'zendesk-setup.rb'
 require 'rest-client'
 require 'json'
 
-# Setup time window
-window_start_time = Time.now - 2 * 3600
+# Setup time window - schedule is 06, 12, 18, so need to look back 12h to handle 06 run.
+window_start_time = Time.now - 12 * 3600
 start_time = window_start_time.strftime('%Y-%m-%dT%H:%M:%S%z')
 
 # Change date to 2020-01-01
