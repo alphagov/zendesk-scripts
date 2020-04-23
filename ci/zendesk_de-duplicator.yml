@@ -10,7 +10,7 @@ resources:
   type: time
   icon: alarm
   source:
-    location: {interval: 1h}
+    interval: 1h
 
 - name: dedupe-repository
   type: docker-image
@@ -44,13 +44,9 @@ jobs:
         - -xce
         - |
           cd /usr/src/app
-          export ZENDESK_LOG_FILE=zendesk-dedupe-tickets.`date +%Y-%m-%d%H%M`
           bundle exec ruby /usr/src/app/lib/zendesk-ticket-deduplicator.rb
-          aws s3 cp $ZENDESK_LOG_FILE s3://${S3_BUCKET_NAME}/
         path: /bin/bash
       params:
-        S3_BUCKET_NAME: ((readonly_private_bucket_name))
         ZENDESK_URL: ((zendesk-url))
         ZENDESK_USER_EMAIL: ((zendesk-email))
         ZENDESK_TOKEN: ((zendesk-token))
-

@@ -238,15 +238,15 @@ sh scripts/merge-agent-and-group-description.sh
 ### Adhoc Scripts
 
 #### De-duplicate support queue - manual script
+The purpose of this script is to identify multiple tickets from the same UserID which match a set of parameters. If there are > 1 not closed or solved, they are moved to a dedicated Zendesk queue.
 
-* Add local ZENDESK_LOG_FILE environmental Var as above.
-* Edit date required in this line, e.g.:
+Edit window required (e.g. 12 hours) in this line, e.g.:
 ```
-- search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=#{start_time}")
 
-+ search_results = @client.search(:query => "type:user role:end-user -name:Zendesk organization:none created_at>=2020-04-13")
+window_start_time = Time.now - 12 * 3600
+
 ```
-* Execute script
+Execute script
 ```
 bundle exec ruby lib/zendesk-ticket-deduplicator.rb
 ```
