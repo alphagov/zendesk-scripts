@@ -242,7 +242,7 @@ sh scripts/merge-agent-and-group-description.sh
 * The script is automated via a Concourse pipeline called 'zendesk-deduplicator'. On a successful merge to master, a new docker container is built, tagged and stored. Following the schedule, the latest version of the container is retrieved and the ruby script executed. Secrets are stored using AWS SSM.
 * The script requires sufficient permissions in Zendesk and is configured to use account email and a token as auth.
 
-To use the script from the CLI, set the environment variables as above, then:
+To use the script from the CLI, set the environment variables as [above](#add-environmental-variables-to-bashrc-or-to-screen-session), then:
 
 1. Edit window required (e.g. 24 hours) in this line, e.g.:
 ```
