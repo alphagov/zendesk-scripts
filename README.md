@@ -246,7 +246,6 @@ To use the script from the CLI, set the environment variables as above, then:
 
 1. Edit window required (e.g. 24 hours) in this line, e.g.:
 ```
-
 window_start_time = Time.now - 24 * 3600
 
 ```
