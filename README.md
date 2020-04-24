@@ -235,18 +235,20 @@ jq -r '.name + "," + .role + "," + (.default_group_id|tostring) + "," + (.active
 sh scripts/merge-agent-and-group-description.sh
 ```
 
-### Adhoc Scripts
+### Other Scripts
 
-#### De-duplicate support queue - manual script
-The purpose of this script is to identify multiple tickets from the same UserID which match a set of parameters. If there are > 1 not closed or solved, they are moved to a dedicated Zendesk queue.
+#### De-duplicate support queue
+* The script uses the Zendesk API to identify multiple tickets from the same UserID in the 1st line support queue which match a set of parameters. If there are > 1 tickets with a status of not closed or solved, they are moved to a dedicated Zendesk queue.
+* The script is automated via a Concourse pipeline called `zendesk-deduplicator`. On a successful merge to master, a new docker container is built, tagged and stored. Following the schedule, the latest version of the container is retrieved and the ruby script is executed. Secrets are stored using AWS SSM.
+* The script requires sufficient permissions in Zendesk and is configured to use an account email address and an API token for authenticating API requests.
 
-Edit window required (e.g. 12 hours) in this line, e.g.:
+To use the script from the CLI, set the environment variables as [above](#add-environmental-variables-to-bashrc-or-to-screen-session), then:
+
+1. Edit window required (e.g. 24 hours) in this line, e.g.:
 ```
-
-window_start_time = Time.now - 12 * 3600
-
+window_start_time = Time.now - 24 * 3600
 ```
-Execute script
+2. Execute script
 ```
 bundle exec ruby lib/zendesk-ticket-deduplicator.rb
 ```
