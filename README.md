@@ -253,6 +253,15 @@ window_start_time = Time.now - 24 * 3600
 bundle exec ruby lib/zendesk-ticket-deduplicator.rb
 ```
 
+##### Deploy the pipeline
+
+```
+fly  -t cd-autom8 set-pipeline -p zendesk-deduplicator -c ci/zendesk_de-duplicator.yml
+```
+
+##### Important Note
+
+This pipeline should only run 6 hourly in order to mesh with the manual processes carried out by the support team. If updating the code, please pause the pipeline to ensure it does not run between the 6 hour windows.
 
 ## Contributing
 
