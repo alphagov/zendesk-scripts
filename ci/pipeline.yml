@@ -5,6 +5,9 @@ resources:
   source:
     branch: master
     uri: "https://github.com/alphagov/zendesk-scripts.git"
+    ignore_paths:
+    - lib/zendesk-ticket-deduplicator.rb
+    - ci/zendesk_de-duplicator.yml
 
 - name: nightly
   type: time
@@ -48,10 +51,10 @@ jobs:
         - |
           cd /usr/src/app
           export ZENDESK_LOG_FILE=zendesk-GDPR-tickets.`date +%Y-%m-%d`
-          bundle exec ruby /usr/src/app/lib/tickets-autom8-able.rb
+          bundle exec ruby lib/tickets-autom8-able.rb
           aws s3 cp $ZENDESK_LOG_FILE s3://${S3_BUCKET_NAME}/
           export ZENDESK_LOG_FILE=zendesk-GDPR-users.`date +%Y-%m-%d`
-          bundle exec ruby /usr/src/app/lib/user-ids-autom8-able.rb
+          bundle exec ruby lib/user-ids-autom8-able.rb
           aws s3 cp $ZENDESK_LOG_FILE s3://${S3_BUCKET_NAME}/
         path: /bin/bash
       params:

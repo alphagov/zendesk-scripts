@@ -5,6 +5,9 @@ resources:
   source:
     branch: master
     uri: "https://github.com/alphagov/zendesk-scripts.git"
+    paths:
+    - lib/zendesk-ticket-deduplicator.rb
+    - ci/zendesk_de-duplicator.yml
 
 - name: schedule
   type: time
@@ -46,7 +49,7 @@ jobs:
         - -xce
         - |
           cd /usr/src/app
-          bundle exec ruby /usr/src/app/lib/zendesk-ticket-deduplicator.rb
+          bundle exec ruby lib/zendesk-ticket-deduplicator.rb
         path: /bin/bash
       params:
         ZENDESK_URL: https://govuk.zendesk.com/api/v2
