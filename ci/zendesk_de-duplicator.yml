@@ -6,7 +6,7 @@ resources:
     branch: master
     uri: "https://github.com/alphagov/zendesk-scripts.git"
     paths:
-    - /usr/src/app/lib/zendesk-ticket-deduplicator.rb
+    - lib/zendesk-ticket-deduplicator.rb
     - ci/zendesk_de-duplicator.yml
 
 - name: schedule
