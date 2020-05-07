@@ -259,9 +259,11 @@ bundle exec ruby lib/zendesk-ticket-deduplicator.rb
 fly  -t cd-autom8 set-pipeline -p zendesk-deduplicator -c ci/zendesk_de-duplicator.yml
 ```
 
-##### Important Note
+##### Important Notes
 
-This pipeline should only run 6 hourly in order to mesh with the manual processes carried out by the support team. If updating the code, please pause the pipeline to ensure it does not run between the 6 hour windows.
+* This pipeline should only run 6 hourly in order to mesh with the manual processes carried out by the support team. If updating the code, please pause the pipeline before merging to ensure it does not run between the 6 hour windows.
+* Running outside of the schedule may cause tickets to be moved around unexpectedly during the hours people are working on them.
+
 
 ## Contributing
 
