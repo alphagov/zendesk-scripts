@@ -5,7 +5,7 @@ require 'zendesk_api'
 require 'rest-client'
 require 'json'
 
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 # TODO LIMIT THE DATE RANGE AS 8000+ PAGES CURRENTLY!!!
 

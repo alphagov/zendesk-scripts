@@ -1,7 +1,7 @@
 require 'date'
 require 'json'
 require 'zendesk_api'
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 tomorrow = Date.today.next_day
 lastyear = tomorrow - 365

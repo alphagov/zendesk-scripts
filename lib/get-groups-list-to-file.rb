@@ -2,7 +2,7 @@ require 'date'
 require 'json'
 require 'zendesk_api'
 
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 output_file = "data/groups.out"
 

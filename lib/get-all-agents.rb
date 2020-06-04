@@ -4,7 +4,7 @@ require 'zendesk_api'
 require 'rest-client'
 require 'json'
 
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 # Usage: bundle exec ruby lib/get-all-agents.rb > data/agents.json
 

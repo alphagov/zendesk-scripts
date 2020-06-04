@@ -1,6 +1,6 @@
 require 'zendesk_api'
 
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 group_id = ENV['ZENDESK_GROUP']
 

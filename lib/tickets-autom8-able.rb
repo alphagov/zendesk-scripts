@@ -1,6 +1,6 @@
 require 'zendesk_api'
 
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 today = Date.today
 lastyear = Date.today.next_day - 365

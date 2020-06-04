@@ -1,4 +1,4 @@
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 require 'rest-client'
 require 'json'

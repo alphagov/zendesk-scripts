@@ -5,7 +5,7 @@ require 'zendesk_api'
 require 'rest-client'
 require 'json'
 
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 lastyear = Date.today.prev_day - 365
 puts "last year:#{lastyear}"

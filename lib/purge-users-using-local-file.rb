@@ -3,7 +3,7 @@ require 'rest-client'
 require 'json'
 require 'date'
 
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 # Setup vars
 

@@ -2,7 +2,7 @@ require 'zendesk_api'
 require 'rest-client'
 require 'json'
 
-require_relative 'zendesk-setup.rb'
+require_relative 'zendesk_setup'
 
 lastyear = Date.today.next_day - 365
 source_user_file = "data/selected_user_ids_meeting_gdpr_params.json"
