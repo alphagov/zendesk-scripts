@@ -6,6 +6,7 @@ require 'rest-client'
 require 'json'
 
 require_relative 'zendesk_setup'
+@client = create_zendesk_client_from_env(ENV)
 
 lastyear = Date.today.prev_day - 365
 puts "last year:#{lastyear}"

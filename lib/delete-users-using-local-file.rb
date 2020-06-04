@@ -4,6 +4,7 @@ require 'json'
 require 'date'
 
 require_relative 'zendesk_setup'
+@client = create_zendesk_client_from_env(ENV)
 
 # Setup vars
 

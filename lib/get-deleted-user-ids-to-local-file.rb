@@ -6,6 +6,7 @@ require 'rest-client'
 require 'json'
 
 require_relative 'zendesk_setup'
+@client = create_zendesk_client_from_env(ENV)
 
 # TODO LIMIT THE DATE RANGE AS 8000+ PAGES CURRENTLY!!!
 

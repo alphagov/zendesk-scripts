@@ -5,6 +5,7 @@ require 'rest-client'
 require 'json'
 
 require_relative 'zendesk_setup'
+@client = create_zendesk_client_from_env(ENV)
 
 # Usage: bundle exec ruby lib/get-all-agents.rb > data/agents.json
 

@@ -1,6 +1,7 @@
 require 'zendesk_api'
 
 require_relative 'zendesk_setup'
+@client = create_zendesk_client_from_env(ENV)
 
 group_id = ENV['ZENDESK_GROUP']
 

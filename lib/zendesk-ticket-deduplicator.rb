@@ -1,4 +1,5 @@
 require_relative 'zendesk_setup'
+@client = create_zendesk_client_from_env(ENV)
 
 require 'rest-client'
 require 'json'

@@ -1,6 +1,7 @@
 require 'zendesk_api'
 
 require_relative 'zendesk_setup'
+@client = create_zendesk_client_from_env(ENV)
 
 today = Date.today
 lastyear = Date.today.next_day - 365
