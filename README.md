@@ -68,6 +68,7 @@ Follow the instructions to hijack the container and add 'per pipeline' entries f
 * ZENDESK_TOKEN
 * ZENDESK_USER_PASSWORD (Only required if token not available)
 
+The Zendesk account email address and password are stored in [re-secrets](https://github.com/alphagov/re-secrets/) because together they have hard deletion capability in many ticket / user groups.
 
 
 #### Deploy the pipeline
