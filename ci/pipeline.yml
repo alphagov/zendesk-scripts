@@ -39,7 +39,6 @@ jobs:
   - get: nightly
     trigger: true
   - get: gdpr-repository
-    trigger: true
     passed: [build-zendesk-GDPR-cleaner]
   - task: run
     image: gdpr-repository
