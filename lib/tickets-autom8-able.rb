@@ -9,6 +9,8 @@ directory_name = "#{directory}-#{today}"
 
 Dir.mkdir(directory_name) unless File.exists?(directory_name)
 
+output_to_console = ENV.fetch('OUTPUT_TO_CONSOLE', 'false').to_s.downcase == "true" 
+
 # get groups, so we are future proof
 groups_list = @client.groups
 
@@ -18,8 +20,10 @@ groups_list.each do |group|
   ticket_count_for_period = 0
 
   ticket_count_for_period = @client.search(:query => "type:ticket group:#{group_id} organization:none status:closed updated>=2012-01-01 updated<#{lastyear}").count.to_i
-  puts "Deletable Tickets for Group: #{group_id} : #{ticket_count_for_period}"
-  
+  if output_to_console
+    puts "Deletable Tickets for Group: #{group_id} : #{ticket_count_for_period}"
+  end
+
   if ticket_count_for_period != 0
     # calcuate no. of pages @ 100 items/page
     number_of_pages = (ticket_count_for_period.to_f / 100).ceil + 1
@@ -48,7 +52,9 @@ File.open(log_file_name, "w") {|log_file|
   filenames.each do |file|
     File.open("#{directory_name}/#{file}").each do |ticket_id|
       message = "Deleting Ticket: #{ticket_id.gsub("\n", '')} from Group: #{file}"
-      puts message
+      if output_to_console
+        puts message
+      end
       log_file.puts message
       @client.tickets.destroy!(:id => ticket_id.to_i)
     end
