@@ -44,5 +44,5 @@ jobs:
 
           bundle exec ruby lib/zendesk-ticket-deduplicator.rb > $ZENDESK_LOG_FILE
 
-          aws s3 cp $ZENDESK_LOG_FILE s3://${{ secrets.AWS_S3_BUCKET }}/
+          aws s3 cp $ZENDESK_LOG_FILE s3://${{ secrets.DEDUPE_AWS_S3_BUCKET }}/
 
