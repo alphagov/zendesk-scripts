@@ -9,9 +9,13 @@ source_user_file = "data/selected_user_ids_meeting_gdpr_params.json"
 
 output_to_console = ENV.fetch('OUTPUT_TO_CONSOLE', 'false').to_s.downcase == "true" 
 
+puts "Outputting to console: #{output_to_console}"
+
 def hard_delete(user_id, url, log_file)
   message = "Hard deleting user_id: #{user_id}"
-  puts message
+  if output_to_console
+    puts message
+  end
   log_file.puts message
 
   begin
