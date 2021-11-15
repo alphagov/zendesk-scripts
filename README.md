@@ -29,53 +29,30 @@ A collection of scripts and pipelines to locate and remove legacy Zendesk ticket
 
 * These instructions will get the project up and running on your local machine for development and testing purposes.
 * It is highly recommended that an AWS VM is used for the longer manual scripted tasks.
-* Concourse is the currently preferred automation tool.
 * You will require a Zendesk account which has 'admin' privileges and an associated token.
 * Use of linux 'screen' command is highly recommended
 * Postman has proved very useful for developing and testing queries
 
 
-### Clone the repo
-
-```
-git clone git@github.com:alphagov/zendesk-scripts
-```
-
-### Deploy the pipeline
-
-#### Required 
-
-Download and install correct version of 'fly'
-
-
-#### Login to selected Concourse
-
-e.g. 
-
-```
-fly --target cd-autom8 login --team-name autom8 --concourse-url https://cd.gds-reliability.engineering
-```
-
-
-#### Secure required secrets
-
-Run 'show-available-pipeline-variables' found inside the 'info' pipeline and be prepared to perform the next step.
-
-Follow the instructions to hijack the container and add 'per pipeline' entries for the following secrets:
+## Environment variables
 
 * ZENDESK_USER_EMAIL
 * ZENDESK_URL
 * ZENDESK_TOKEN
 * ZENDESK_USER_PASSWORD (Only required if token not available)
+* OUTPUT_TO_CONSOLE (Set to true if you want to see the output of 'user-ids-autom8-able.rb')
 
 The Zendesk account email address and password are stored in [re-secrets](https://github.com/alphagov/re-secrets/) because together they have hard deletion capability in many ticket / user groups.
 
+## Pipelines
 
-#### Deploy the pipeline
+Theses scripts are run periodically each night by Github Actions.
 
-```
-fly set-pipeline -p zendesk-gdpr-cleaner -t cd-autom8 -n autom8 -c ci/pipeline.yml
-```
+The pipelines are located under `./github/workflows/*`
+
+[Deduplicator Script](https://github.com/alphagov/zendesk-scripts/actions/workflows/zendesk_deduplicator.yml)
+[Ticket & User Tidier](https://github.com/alphagov/zendesk-scripts/actions/workflows/zendesk_remove_tickets_users.yml)
+
 
 ## Using the scripts (principally to address historic records in large datasets)
 
@@ -240,7 +217,6 @@ sh scripts/merge-agent-and-group-description.sh
 
 #### De-duplicate support queue
 * The script uses the Zendesk API to identify multiple tickets from the same UserID in the 1st line support queue which match a set of parameters. If there are > 1 tickets with a status of not closed or solved, they are moved to a dedicated Zendesk queue.
-* The script is automated via a Concourse pipeline called `zendesk-deduplicator`. On a successful merge to master, a new docker container is built, tagged and stored. Following the schedule, the latest version of the container is retrieved and the ruby script is executed. Secrets are stored using AWS SSM.
 * The script requires sufficient permissions in Zendesk and is configured to use an account email address and an API token for authenticating API requests.
 
 To use the script from the CLI, set the environment variables as [above](#add-environmental-variables-to-bashrc-or-to-screen-session), then:
@@ -254,28 +230,10 @@ window_start_time = Time.now - 24 * 3600
 bundle exec ruby lib/zendesk-ticket-deduplicator.rb
 ```
 
-##### Deploy the pipeline
-
-```
-fly  -t cd-autom8 set-pipeline -p zendesk-deduplicator -c ci/zendesk_de-duplicator.yml
-```
-
 ##### Important Notes
 
 * This pipeline should only run 6 hourly in order to mesh with the manual processes carried out by the support team. If updating the code, please pause the pipeline before merging to ensure it does not run between the 6 hour windows.
 * Running outside of the schedule may cause tickets to be moved around unexpectedly during the hours people are working on them.
-
-
-## Contributing
-
-Suggested reading: [Good Contributing guide](https://gist.github.com/PurpleBooth/b24679402957c63ec426)
-
-
-
-## Authors
-
-* **Issy Long** - some ruby consultancy and initial work
-* **David Pye** - Refactor task into year chunks to permit multitasking some bashing and automating via Concourse pipeline.
 
 
 ## License
