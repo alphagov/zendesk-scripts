@@ -1,0 +1,48 @@
+name: zendesk-deduplicator
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    permissions:
+      id-token: write
+      contents: read
+    environment: production
+    if: github.ref == 'refs/heads/master' # Only run on master.
+    env:
+      ZENDESK_URL: ${{ secrets.ZENDESK_URL}}
+      ZENDESK_USER_EMAIL: ${{ secrets.ZENDESK_USER_EMAIL }}
+      ZENDESK_TOKEN: ${{ secrets.ZENDESK_TOKEN }}
+    steps:
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # 2.4.0
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@2be883a47f447f8ec9c0c785288c7c86fdbbd9a7 # Master 10/11/21
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: eu-west-2
+      - name: install-system-dependencies
+        run: |        
+          sudo apt-get update
+
+          sudo apt-get install -y ruby=1:2.7+1
+          sudo apt-get install -y python3-pip=20.0.2-5ubuntu1.6
+          
+          sudo gem install bundler:1.17.2
+      - name: install-ruby-dependencies
+        run: | 
+          bundle install
+      - name: install-python-dependencies
+        run: | 
+          pip3 install awscli
+      - name: dedupe-tickets
+        run: |
+          export ZENDESK_LOG_FILE=zendesk-ticket-deduplication.`date +%Y-%m-%d`
+
+          bundle exec ruby lib/zendesk-ticket-deduplicator.rb > $ZENDESK_LOG_FILE
+
+          aws s3 cp $ZENDESK_LOG_FILE s3://${{ secrets.DEDUPE_AWS_S3_BUCKET }}/
+
