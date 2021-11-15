@@ -19,11 +19,6 @@ jobs:
       ZENDESK_TOKEN: ${{ secrets.ZENDESK_TOKEN }}
     steps:
       - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # 2.4.0
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@2be883a47f447f8ec9c0c785288c7c86fdbbd9a7 # Master 10/11/21
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: eu-west-2
       - name: install-system-dependencies
         run: |        
           sudo apt-get update
@@ -39,16 +34,35 @@ jobs:
       - name: install-python-dependencies
         run: | 
           pip3 install awscli
+
       - name: prune-tickets
         run: |
           export ZENDESK_LOG_FILE=zendesk-GDPR-tickets.`date +%Y-%m-%d`
           bundle exec ruby lib/tickets-autom8-able.rb
+      - name: Configure AWS Credentials prune ticket report
+        uses: aws-actions/configure-aws-credentials@2be883a47f447f8ec9c0c785288c7c86fdbbd9a7 # Master 10/11/21
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: eu-west-2
+      - name: Upload pruned tickets report to S3
+        run: |
+          export ZENDESK_LOG_FILE=zendesk-GDPR-tickets.`date +%Y-%m-%d`
           aws s3 cp $ZENDESK_LOG_FILE s3://${{ secrets.AWS_S3_BUCKET }}/
+
       - name: prune-users
         run: |
           export ZENDESK_LOG_FILE=zendesk-GDPR-users.`date +%Y-%m-%d`
           bundle exec ruby lib/user-ids-autom8-able.rb
+      - name: Configure AWS Credentials prune users report
+        uses: aws-actions/configure-aws-credentials@2be883a47f447f8ec9c0c785288c7c86fdbbd9a7 # Master 10/11/21
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: eu-west-2
+      - name: Upload pruned users report to S3
+        run: |
+          export ZENDESK_LOG_FILE=zendesk-GDPR-users.`date +%Y-%m-%d`
           aws s3 cp $ZENDESK_LOG_FILE s3://${{ secrets.AWS_S3_BUCKET }}/
+
       - name: cronitor
         run: |
           set -ue
