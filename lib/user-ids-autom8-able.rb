@@ -7,13 +7,13 @@ require_relative 'zendesk-setup.rb'
 lastyear = Date.today.next_day - 365
 source_user_file = "data/selected_user_ids_meeting_gdpr_params.json"
 
-output_to_console = ENV.fetch('OUTPUT_TO_CONSOLE', 'false').to_s.downcase == "true" 
+$output_to_console = ENV.fetch('OUTPUT_TO_CONSOLE', 'false').to_s.downcase == "true" 
 
-puts "Outputting to console: #{output_to_console}"
+puts "Outputting to console: #{$output_to_console}"
 
 def hard_delete(user_id, url, log_file)
   message = "Hard deleting user_id: #{user_id}"
-  if output_to_console
+  if $output_to_console
     puts message
   end
   log_file.puts message
@@ -21,14 +21,14 @@ def hard_delete(user_id, url, log_file)
   begin
     # api does not support hard delete yet, so hard delete like this...
     full_url = "#{url}#{user_id}.json"
-    if output_to_console
+    if $output_to_console
       puts "full_url: #{full_url}"
     end
     RestClient::Request.execute(method: :delete, url: full_url, user: ENV['ZENDESK_USER_EMAIL']+'/token', password: ENV['ZENDESK_TOKEN'])
 
   rescue RestClient::Exception => api_error
     message = "Received error from ZenDesk API Skipping over user #{user_id} => #{api_error}"
-    if output_to_console
+    if $output_to_console
       puts message
     end
     log_file.puts message
@@ -47,7 +47,7 @@ search_results = @client.search(:query => "type:user role:end-user -name:Zendesk
 user_count =  search_results.count
 number_of_pages = (user_count.to_f / 100).ceil
 
-if output_to_console
+if $output_to_console
   puts "Retrieving #{user_count} user accounts, this may take a while"
 end
 
@@ -82,7 +82,7 @@ File.open(log_file_name, "w") do |log_file|
     # then skip as we cannot delete them
     if user["shared_agent"]
       message = "user account #{user_id} cannot be deleted as it is marked as a 'shared_agent' from another zendesk account"
-      if output_to_console
+      if $output_to_console
         puts message
       end
       log_file.puts message
@@ -95,7 +95,7 @@ File.open(log_file_name, "w") do |log_file|
     # is user account already soft deleted, if so, hard delete
     if active.to_s == "false"
       message = "user account #{user_id} is already soft deleted"
-      if output_to_console
+      if $output_to_console
         puts message
       end
       log_file.puts message
@@ -120,14 +120,14 @@ File.open(log_file_name, "w") do |log_file|
         ticket_count = Integer count
 
         message = "ticket_count: #{ticket_count}"
-        if output_to_console
+        if $output_to_console
           puts message
         end
         log_file.puts message
 
         if ticket_count == 0
           message = "Soft deleting user_id: #{user_id}"
-          if output_to_console
+          if $output_to_console
             puts message
           end
           log_file.puts message
@@ -137,7 +137,7 @@ File.open(log_file_name, "w") do |log_file|
 
           rescue ZendeskAPI::Error::RecordInvalid => api_error
             message = "Received error user #{user_id} already deleted, skipping over. Details: #{api_error.backtrace}"
-            if output_to_console
+            if $output_to_console
               puts message
             end
             log_file.puts message
@@ -145,7 +145,7 @@ File.open(log_file_name, "w") do |log_file|
 
           rescue ZendeskAPI::Error::ReadTimeout => api_error
             message = "Received network error deleting user #{user_id}, skipping over. Details: #{api_error.backtrace}"
-            if output_to_console
+            if $output_to_console
               puts message
             end
             log_file.puts message
@@ -153,7 +153,7 @@ File.open(log_file_name, "w") do |log_file|
 
           rescue ZendeskAPI::Error::NetworkError => api_error
             message = "Received network error, check user #{user_id}, skipping over. Details: #{api_error.backtrace}"
-            if output_to_console
+            if $output_to_console
               puts message
             end
             log_file.puts message
@@ -164,7 +164,7 @@ File.open(log_file_name, "w") do |log_file|
 
         else
           message = "user_id: #{user_id} has #{ticket_count} tickets, not deleting"
-          if output_to_console
+          if $output_to_console
             puts message
           end
           log_file.puts message
